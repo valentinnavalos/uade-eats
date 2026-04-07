@@ -11,8 +11,6 @@ import {
   HelpCircle,
   Flag,
   LogOut,
-  ShoppingBag,
-  Star,
 } from "lucide-react"
 import { BottomNav } from "@/components/bottom-nav"
 import { cn } from "@/lib/utils"
@@ -81,12 +79,12 @@ export default function ProfilePage() {
               className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black text-white shrink-0"
               style={{ backgroundColor: "#F97316" }}
             >
-              VA
+              VN
             </div>
 
             <div className="flex-1 min-w-0">
-              <p className="font-black text-base text-foreground leading-tight">Valentín Avalos</p>
-              <p className="text-xs text-muted-foreground mt-0.5">valentinavalossss@uade.edu.ar</p>
+              <p className="font-black text-base text-foreground leading-tight">John Von Neumann</p>
+              <p className="text-xs text-muted-foreground mt-0.5">vonneumann@uade.edu.ar</p>
               <div
                 className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold"
                 style={{ backgroundColor: "#FFF0E6", color: "#F97316" }}
@@ -102,35 +100,6 @@ export default function ProfilePage() {
             >
               <ChevronRight size={16} className="text-muted-foreground" />
             </button>
-          </div>
-
-          {/* Stats row */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-2xl bg-card border border-border/60 p-4 flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                style={{ backgroundColor: "#FFF0E6" }}
-              >
-                <ShoppingBag size={18} style={{ color: "#F97316" }} />
-              </div>
-              <div>
-                <p className="text-xl font-black text-foreground leading-none">23</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5 leading-tight">pedidos totales</p>
-              </div>
-            </div>
-
-            <div className="rounded-2xl bg-card border border-border/60 p-4 flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                style={{ backgroundColor: "#FFF0E6" }}
-              >
-                <Star size={18} style={{ color: "#F97316" }} />
-              </div>
-              <div>
-                <p className="text-sm font-black text-foreground leading-none">Cafetería</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5 leading-tight">Pepe · favorito</p>
-              </div>
-            </div>
           </div>
 
           {/* Settings groups */}
