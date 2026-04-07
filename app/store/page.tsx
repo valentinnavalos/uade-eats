@@ -269,7 +269,10 @@ export default function StorePage() {
           active={activeNav}
           onChange={(id) => {
             setActiveNav(id)
+            if (id === "home") router.push("/")
             if (id === "cart") router.push("/cart")
+            if (id === "orders") router.push("/orders")
+            if (id === "profile") router.push("/profile")
           }}
           cartCount={cartCount}
           cartBump={cartBump}
