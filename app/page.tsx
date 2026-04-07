@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import { useRouter } from "next/navigation"
 import { Bell, MapPin } from "lucide-react"
 import { StoreCard, type Store } from "@/components/store-card"
 import { FilterChips } from "@/components/filter-chips"
@@ -74,6 +75,7 @@ const CATEGORY_DISPLAY: Record<string, string> = {
 }
 
 export default function HomePage() {
+  const router = useRouter()
   const [activeFilter, setActiveFilter] = useState("all")
   const [activeNav, setActiveNav] = useState("home")
   const [search, setSearch] = useState("")
@@ -185,12 +187,19 @@ export default function HomePage() {
                 Usá el código <span className="font-bold text-white">UADE2025</span> en tu primer pedido
               </p>
             </div>
-            <div className="text-4xl shrink-0">🎉</div>
+            <div className="text-4xl shrink-0">���</div>
           </div>
         </main>
 
         {/* ── Bottom Navigation ── */}
-        <BottomNav active={activeNav} onChange={setActiveNav} cartCount={cartCount} />
+        <BottomNav
+          active={activeNav}
+          onChange={(id) => {
+            setActiveNav(id)
+            if (id === "cart") router.push("/cart")
+          }}
+          cartCount={cartCount}
+        />
       </div>
     </div>
   )

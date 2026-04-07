@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo, useCallback } from "react"
+import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { ArrowLeft, Star, Clock, ShoppingBag } from "lucide-react"
 import { ProductCard, type Product } from "@/components/product-card"
@@ -96,6 +97,7 @@ const CATEGORIES = ["Bebidas", "Sándwiches", "Snacks", "Postres"]
 type CartMap = Record<string, number>
 
 export default function StorePage() {
+  const router = useRouter()
   const [activeCategory, setActiveCategory] = useState("Bebidas")
   const [activeNav, setActiveNav] = useState("home")
   const [cart, setCart] = useState<CartMap>({})
@@ -236,6 +238,7 @@ export default function StorePage() {
           {cartCount > 0 && (
             <div className="mx-4 mt-6">
               <button
+                onClick={() => router.push("/cart")}
                 className="w-full flex items-center justify-between px-5 py-4 rounded-2xl text-white font-bold shadow-lg active:scale-[0.98] transition-transform duration-150"
                 style={{ backgroundColor: "#F97316" }}
                 aria-label={`Ver carrito — ${cartCount} ${cartCount === 1 ? "producto" : "productos"}`}
