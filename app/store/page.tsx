@@ -267,7 +267,10 @@ export default function StorePage() {
         {/* ── Bottom navigation ────────────────────────────────────────── */}
         <BottomNav
           active={activeNav}
-          onChange={setActiveNav}
+          onChange={(id) => {
+            setActiveNav(id)
+            if (id === "cart") router.push("/cart")
+          }}
           cartCount={cartCount}
           cartBump={cartBump}
         />
