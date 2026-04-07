@@ -1,6 +1,7 @@
 "use client"
 
 import Image from "next/image"
+import Link from "next/link"
 import { Clock, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -23,9 +24,10 @@ interface StoreCardProps {
 
 export function StoreCard({ store, onClick }: StoreCardProps) {
   return (
-    <button
+    <Link
+      href="/store"
       onClick={onClick}
-      className="w-full text-left bg-card rounded-2xl overflow-hidden shadow-sm border border-border/50 active:scale-[0.99] transition-transform duration-150 hover:shadow-md"
+      className="block w-full text-left bg-card rounded-2xl overflow-hidden shadow-sm border border-border/50 active:scale-[0.99] transition-transform duration-150 hover:shadow-md"
     >
       {/* Food image */}
       <div className="relative w-full h-44 overflow-hidden">
@@ -98,6 +100,6 @@ export function StoreCard({ store, onClick }: StoreCardProps) {
           </div>
         </div>
       </div>
-    </button>
+    </Link>
   )
 }
