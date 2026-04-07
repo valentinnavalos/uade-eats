@@ -103,7 +103,7 @@ export default function CartPage() {
       <div className="w-full max-w-[480px] min-h-svh flex flex-col bg-background relative">
 
         {/* ── Sticky header ───────────────────────────────────────────────── */}
-        <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/40 px-4 pt-12 pb-4">
+        <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/40 px-4 pt-6 pb-4">
           {/* Back row */}
           <div className="flex items-center gap-3">
             <button
@@ -193,7 +193,7 @@ export default function CartPage() {
             {/* ── Fixed bottom: subtotal + CTA ──────────────────────────── */}
             <div className="fixed bottom-0 left-0 right-0 z-50 max-w-[480px] mx-auto bg-card border-t border-border/60 px-4 pb-safe pt-4">
               {/* Subtotal rows */}
-              <div className="space-y-2 mb-4">
+              <div className="space-y-2 mb-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">
                     Subtotal ({cartCount} {cartCount === 1 ? "ítem" : "ítems"})

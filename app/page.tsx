@@ -100,7 +100,7 @@ export default function HomePage() {
       <div className="w-full max-w-[480px] min-h-svh flex flex-col bg-background relative">
 
         {/* ── Header ── */}
-        <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/40 px-4 pt-12 pb-4 space-y-4">
+        <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/40 px-4 pt-6 pb-4 space-y-4">
           {/* Top row */}
           <div className="flex items-center justify-between">
             <div>

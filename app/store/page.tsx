@@ -143,7 +143,7 @@ export default function StorePage() {
         <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/40">
 
           {/* Back row */}
-          <div className="flex items-center gap-3 px-4 pt-12 pb-3">
+          <div className="flex items-center gap-3 px-4 pt-6 pb-3">
             <a
               href="/"
               aria-label="Volver al inicio"
