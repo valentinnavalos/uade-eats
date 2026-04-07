@@ -103,7 +103,7 @@ export function CartItem({ product, quantity, onAdd, onRemove, onDelete }: CartI
       {/* Card */}
       <div
         className={cn(
-          "flex items-center gap-3 bg-card rounded-2xl p-3 shadow-sm border border-border/50 select-none cursor-grab active:cursor-grabbing",
+          "flex items-start gap-3 bg-card rounded-2xl p-3.5 shadow-sm border border-border/50 select-none cursor-grab active:cursor-grabbing",
           isDragging ? "transition-none" : "transition-transform duration-200 ease-out"
         )}
         style={{ transform: `translateX(${offsetX}px)` }}
@@ -116,59 +116,73 @@ export function CartItem({ product, quantity, onAdd, onRemove, onDelete }: CartI
         onMouseLeave={onMouseUp}
       >
         {/* Thumbnail */}
-        <div className="relative w-[72px] h-[72px] shrink-0 rounded-xl overflow-hidden">
+        <div className="relative w-20 h-20 shrink-0 rounded-xl overflow-hidden">
           <Image
             src={product.image}
             alt={product.name}
             fill
             className="object-cover"
-            sizes="72px"
+            sizes="80px"
             draggable={false}
           />
         </div>
 
         {/* Content */}
-        <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-foreground text-sm leading-snug truncate">
-            {product.name}
-          </h3>
-          <p className="font-black text-sm mt-1" style={{ color: "#F97316" }}>
-            ${(product.price * quantity).toLocaleString("es-AR")}
-          </p>
-          {quantity > 1 && (
-            <p className="text-xs text-muted-foreground mt-0.5">
-              ${product.price.toLocaleString("es-AR")} c/u
+        <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+          {/* Name + category */}
+          <div>
+            <h3 className="font-bold text-foreground text-sm leading-snug truncate">
+              {product.name}
+            </h3>
+            <p className="text-xs text-muted-foreground leading-snug line-clamp-1 mt-0.5">
+              {product.description}
             </p>
-          )}
-        </div>
+          </div>
 
-        {/* Controls */}
-        <div className="shrink-0 flex items-center gap-1.5">
-          <button
-            onClick={() => quantity === 1 ? handleDelete() : onRemove(product)}
-            aria-label={quantity === 1 ? `Eliminar ${product.name}` : `Quitar uno de ${product.name}`}
-            className="w-8 h-8 rounded-full border-2 flex items-center justify-center active:scale-95 transition-transform duration-150"
-            style={{ borderColor: "#F97316", color: "#F97316" }}
-          >
-            {quantity === 1
-              ? <Trash2 size={13} strokeWidth={2.5} />
-              : <Minus size={14} strokeWidth={2.5} />
-            }
-          </button>
-          <span
-            className="w-6 text-center text-sm font-black tabular-nums"
-            style={{ color: "#F97316" }}
-          >
-            {quantity}
-          </span>
-          <button
-            onClick={() => onAdd(product)}
-            aria-label={`Agregar otro ${product.name}`}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-white active:scale-95 transition-transform duration-150"
-            style={{ backgroundColor: "#F97316" }}
-          >
-            <Plus size={14} strokeWidth={2.5} />
-          </button>
+          {/* Price + controls row */}
+          <div className="flex items-center justify-between gap-2">
+            {/* Prices */}
+            <div>
+              <p className="font-black text-sm leading-none" style={{ color: "#F97316" }}>
+                ${(product.price * quantity).toLocaleString("es-AR")}
+              </p>
+              <p className="text-[11px] text-muted-foreground mt-0.5 leading-none">
+                ${product.price.toLocaleString("es-AR")} c/u
+              </p>
+            </div>
+
+            {/* Quantity pill */}
+            <div
+              className="flex items-center gap-1 rounded-full px-1 py-1"
+              style={{ backgroundColor: "#FFF0E6" }}
+            >
+              <button
+                onClick={() => quantity === 1 ? handleDelete() : onRemove(product)}
+                aria-label={quantity === 1 ? `Eliminar ${product.name}` : `Quitar uno de ${product.name}`}
+                className="w-7 h-7 rounded-full flex items-center justify-center active:scale-90 transition-transform duration-150"
+                style={{ backgroundColor: quantity === 1 ? "#FEE2E2" : "white", color: quantity === 1 ? "#EF4444" : "#F97316" }}
+              >
+                {quantity === 1
+                  ? <Trash2 size={12} strokeWidth={2.5} />
+                  : <Minus size={13} strokeWidth={2.5} />
+                }
+              </button>
+              <span
+                className="w-5 text-center text-sm font-black tabular-nums leading-none"
+                style={{ color: "#F97316" }}
+              >
+                {quantity}
+              </span>
+              <button
+                onClick={() => onAdd(product)}
+                aria-label={`Agregar otro ${product.name}`}
+                className="w-7 h-7 rounded-full flex items-center justify-center text-white active:scale-90 transition-transform duration-150"
+                style={{ backgroundColor: "#F97316" }}
+              >
+                <Plus size={13} strokeWidth={2.5} />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

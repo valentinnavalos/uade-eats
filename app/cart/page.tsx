@@ -149,7 +149,7 @@ export default function CartPage() {
           <CartEmpty onBrowse={() => router.push("/")} />
         ) : (
           <>
-            <main className="flex-1 overflow-y-auto pb-52">
+            <main className="flex-1 overflow-y-auto pb-[272px]">
               {/* Swipe hint */}
               <div className="flex items-center gap-1.5 mx-4 mt-4 mb-3 px-3 py-2 rounded-xl" style={{ backgroundColor: "#FFF0E6" }}>
                 <Info size={13} style={{ color: "#F97316" }} />
@@ -172,7 +172,7 @@ export default function CartPage() {
                 ))}
               </section>
 
-              {/* Order notes (optional, UI only) */}
+              {/* Order notes */}
               <div className="mx-4 mt-5">
                 <label
                   htmlFor="cart-notes"
@@ -191,25 +191,30 @@ export default function CartPage() {
             </main>
 
             {/* ── Fixed bottom: subtotal + CTA ──────────────────────────── */}
-            <div className="fixed bottom-0 left-0 right-0 z-50 max-w-[480px] mx-auto bg-card border-t border-border/60 px-4 pb-safe pt-3">
+            <div className="fixed bottom-0 left-0 right-0 z-50 max-w-[480px] mx-auto bg-card border-t border-border/60 px-4 pt-4 pb-2">
               {/* Subtotal rows */}
-              <div className="space-y-2 mb-2">
+              <div className="space-y-2 mb-3">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">
                     Subtotal ({cartCount} {cartCount === 1 ? "ítem" : "ítems"})
                   </span>
-                  <span className="font-bold text-foreground">
+                  <span className="font-semibold text-foreground">
                     ${subtotal.toLocaleString("es-AR")}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Costo de servicio</span>
-                  <span className="font-bold" style={{ color: "#16A34A" }}>Gratis</span>
+                  <span
+                    className="font-semibold text-xs px-2 py-0.5 rounded-full"
+                    style={{ backgroundColor: "#F0FDF4", color: "#16A34A" }}
+                  >
+                    Gratis
+                  </span>
                 </div>
-                <div className="h-px bg-border my-1" />
+                <div className="h-px bg-border" />
                 <div className="flex items-center justify-between">
                   <span className="font-black text-foreground text-base">Total</span>
-                  <span className="font-black text-foreground text-lg">
+                  <span className="font-black text-foreground text-xl">
                     ${subtotal.toLocaleString("es-AR")}
                     <span className="text-xs font-medium text-muted-foreground ml-1">ARS</span>
                   </span>
