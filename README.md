@@ -8,21 +8,46 @@ This repository is linked to a [v0](https://v0.app) project. You can continue de
 
 [Continue working on v0 →](https://v0.app/chat/projects/prj_Ht4BaMtzJD19JxZp9G0ECDpRdBjs)
 
-## Getting Started
+## Requisitos
 
-First, run the development server::
+- [Node.js](https://nodejs.org/) (versión LTS recomendada)
+- [pnpm](https://pnpm.io/installation) (gestor de paquetes usado en este proyecto)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+## Cómo correr el proyecto
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. **Clonar el repositorio** (si aún no lo tenés) e ir a la carpeta del proyecto:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+   ```bash
+   git clone https://github.com/valentinnavalos/v0-uade-eats.git
+   cd v0-uade-eats
+   ```
+
+2. **Instalar dependencias:**
+
+   ```bash
+   pnpm install
+   ```
+
+3. **Levantar el servidor de desarrollo:**
+
+   ```bash
+   pnpm run dev
+   ```
+
+4. **Abrir la app** en el navegador: [http://localhost:3000](http://localhost:3000)
+
+Los cambios en archivos como `app/page.tsx` se reflejan al guardar (hot reload).
+
+## Otros comandos útiles
+
+| Comando | Descripción |
+| -------- | ----------- |
+| `pnpm run dev` | Servidor de desarrollo (Next.js) |
+| `pnpm run build` | Build de producción |
+| `pnpm run start` | Servidor tras un `pnpm run build` |
+| `pnpm run lint` | Ejecutar ESLint |
+
+Si no usás pnpm, podés instalar con `npm install` / `yarn` y correr los mismos scripts con `npm run` / `yarn`.
 
 ## Learn More
 
