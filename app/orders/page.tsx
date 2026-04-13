@@ -137,20 +137,20 @@ export default function OrdersPage() {
                       {/* Status bar */}
                       <div
                         className="px-4 py-2.5 flex items-center gap-2"
-                        style={{ backgroundColor: isReady ? "#F0FDF4" : "#FFF7ED" }}
+                        style={{ backgroundColor: isReady ? "#F7FEE7" : "#F0FDF4" }}
                       >
                         {isReady ? (
                           <CheckCircle2 size={15} style={{ color: "#16A34A" }} />
                         ) : (
                           <Loader2
                             size={15}
-                            style={{ color: "#F97316" }}
+                            style={{ color: "#4CAF50" }}
                             className="animate-spin"
                           />
                         )}
                         <span
                           className="text-xs font-bold"
-                          style={{ color: isReady ? "#16A34A" : "#F97316" }}
+                          style={{ color: isReady ? "#16A34A" : "#4CAF50" }}
                         >
                           {isReady ? "¡Listo para retirar!" : "En preparación"}
                         </span>
@@ -171,7 +171,7 @@ export default function OrdersPage() {
                           </div>
                           <span
                             className="shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full"
-                            style={{ backgroundColor: "#FFF0E6", color: "#F97316" }}
+                            style={{ backgroundColor: "#F0FDF4", color: "#4CAF50" }}
                           >
                             {order.storeCategory}
                           </span>
@@ -190,7 +190,7 @@ export default function OrdersPage() {
                                       "w-5 h-5 rounded-full flex items-center justify-center transition-colors duration-300",
                                       done ? "text-white" : "bg-muted text-muted-foreground"
                                     )}
-                                    style={done ? { backgroundColor: i === step && !isReady ? "#F97316" : i < step || isReady ? "#16A34A" : "#F97316" } : {}}
+                                    style={done ? { backgroundColor: i === step && !isReady ? "#4CAF50" : i < step || isReady ? "#16A34A" : "#4CAF50" } : {}}
                                   >
                                     {done ? (
                                       i < step || isReady ? (
@@ -228,7 +228,7 @@ export default function OrdersPage() {
                           {isReady ? (
                             <div
                               className="flex items-center gap-1.5 px-3 py-1 rounded-xl"
-                              style={{ backgroundColor: "#F0FDF4" }}
+                              style={{ backgroundColor: "#F7FEE7" }}
                             >
                               <span className="text-xs text-muted-foreground">Código</span>
                               <span className="text-lg font-black" style={{ color: "#16A34A" }}>
@@ -267,7 +267,7 @@ export default function OrdersPage() {
                     {/* Store icon */}
                     <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0"
-                      style={{ backgroundColor: "#FFF0E6" }}
+                      style={{ backgroundColor: "#F0FDF4" }}
                     >
                       🧇
                     </div>

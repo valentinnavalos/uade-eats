@@ -12,12 +12,12 @@ export function CartEmpty({ onBrowse }: CartEmptyProps) {
         {/* Outer ring */}
         <div
           className="w-32 h-32 rounded-full flex items-center justify-center"
-          style={{ backgroundColor: "#FFF0E6" }}
+          style={{ backgroundColor: "#F0FDF4" }}
         >
           {/* Inner circle */}
           <div
             className="w-20 h-20 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: "#F97316" }}
+            style={{ backgroundColor: "#4CAF50" }}
           >
             <ShoppingCart size={32} className="text-white" strokeWidth={1.75} />
           </div>
@@ -25,15 +25,15 @@ export function CartEmpty({ onBrowse }: CartEmptyProps) {
         {/* Floating dots decoration */}
         <span
           className="absolute top-2 right-0 w-4 h-4 rounded-full"
-          style={{ backgroundColor: "#FED7AA" }}
+          style={{ backgroundColor: "#BBF7D0" }}
         />
         <span
           className="absolute bottom-3 left-0 w-3 h-3 rounded-full"
-          style={{ backgroundColor: "#FDBA74" }}
+          style={{ backgroundColor: "#86EFAC" }}
         />
         <span
           className="absolute top-6 left-2 w-2 h-2 rounded-full"
-          style={{ backgroundColor: "#FED7AA" }}
+          style={{ backgroundColor: "#BBF7D0" }}
         />
       </div>
 
@@ -48,7 +48,7 @@ export function CartEmpty({ onBrowse }: CartEmptyProps) {
       <button
         onClick={onBrowse}
         className="mt-8 px-6 py-3.5 rounded-2xl text-sm font-bold text-white shadow-md active:scale-95 transition-transform duration-150"
-        style={{ backgroundColor: "#F97316" }}
+        style={{ backgroundColor: "#4CAF50" }}
       >
         Ver locales
       </button>

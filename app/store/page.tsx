@@ -201,7 +201,7 @@ export default function StorePage() {
             {/* Meta chips over hero */}
             <div className="absolute bottom-3 left-4 flex items-center gap-3">
               <div className="flex items-center gap-1 bg-black/50 backdrop-blur-sm rounded-full px-2.5 py-1">
-                <Star size={11} fill="#F97316" stroke="none" />
+                <Star size={11} fill="#4CAF50" stroke="none" />
                 <span className="text-white text-xs font-bold">{STORE.rating}</span>
                 <span className="text-white/70 text-xs">({STORE.reviewCount})</span>
               </div>
@@ -240,7 +240,7 @@ export default function StorePage() {
               <button
                 onClick={() => router.push("/cart")}
                 className="w-full flex items-center justify-between px-5 py-4 rounded-2xl text-white font-bold shadow-lg active:scale-[0.98] transition-transform duration-150"
-                style={{ backgroundColor: "#F97316" }}
+                style={{ backgroundColor: "#4CAF50" }}
                 aria-label={`Ver carrito — ${cartCount} ${cartCount === 1 ? "producto" : "productos"}`}
               >
                 <div className="flex items-center gap-2">

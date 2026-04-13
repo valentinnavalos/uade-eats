@@ -105,12 +105,12 @@ export default function HomePage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-1.5 text-muted-foreground text-xs font-medium mb-0.5">
-                <MapPin size={12} style={{ color: "#F97316" }} />
+                <MapPin size={12} style={{ color: "#1B6DBF" }} />
                 <span>UADE — Buenos Aires</span>
               </div>
               <h1 className="text-2xl font-black tracking-tight text-foreground leading-none">
                 UADE{" "}
-                <span style={{ color: "#F97316" }} className="font-black">
+                <span style={{ color: "#4CAF50" }} className="font-black">
                   EATS
                 </span>
               </h1>
@@ -122,7 +122,7 @@ export default function HomePage() {
               <Bell size={18} className="text-foreground" />
               <span
                 className="absolute top-2 right-2 w-2 h-2 rounded-full"
-                style={{ backgroundColor: "#F97316" }}
+                style={{ backgroundColor: "#4CAF50" }}
               />
             </button>
           </div>
@@ -157,7 +157,7 @@ export default function HomePage() {
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <div
                 className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 text-3xl"
-                style={{ backgroundColor: "#FFF0E6" }}
+                style={{ backgroundColor: "#F0FDF4" }}
               >
                 🔍
               </div>
@@ -177,13 +177,13 @@ export default function HomePage() {
           {/* Promo banner */}
           <div
             className="mt-6 rounded-2xl p-4 flex items-center gap-4 overflow-hidden relative"
-            style={{ backgroundColor: "#F97316" }}
+            style={{ backgroundColor: "#4CAF50" }}
           >
             <div className="flex-1">
               <p className="text-white font-bold text-base leading-tight text-balance">
                 ¡Primera orden gratis!
               </p>
-              <p className="text-orange-100 text-xs mt-1 leading-relaxed">
+              <p className="text-green-100 text-xs mt-1 leading-relaxed">
                 Usá el código <span className="font-bold text-white">UADE2025</span> en tu primer pedido
               </p>
             </div>

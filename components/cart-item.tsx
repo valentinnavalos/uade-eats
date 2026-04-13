@@ -143,7 +143,7 @@ export function CartItem({ product, quantity, onAdd, onRemove, onDelete }: CartI
           <div className="flex items-center justify-between gap-2">
             {/* Prices */}
             <div>
-              <p className="font-black text-sm leading-none" style={{ color: "#F97316" }}>
+              <p className="font-black text-sm leading-none" style={{ color: "#4CAF50" }}>
                 ${(product.price * quantity).toLocaleString("es-AR")}
               </p>
               <p className="text-[11px] text-muted-foreground mt-0.5 leading-none">
@@ -154,13 +154,13 @@ export function CartItem({ product, quantity, onAdd, onRemove, onDelete }: CartI
             {/* Quantity pill */}
             <div
               className="flex items-center gap-1 rounded-full px-1 py-1"
-              style={{ backgroundColor: "#FFF0E6" }}
+              style={{ backgroundColor: "#F0FDF4" }}
             >
               <button
                 onClick={() => quantity === 1 ? handleDelete() : onRemove(product)}
                 aria-label={quantity === 1 ? `Eliminar ${product.name}` : `Quitar uno de ${product.name}`}
                 className="w-7 h-7 rounded-full flex items-center justify-center active:scale-90 transition-transform duration-150"
-                style={{ backgroundColor: quantity === 1 ? "#FEE2E2" : "white", color: quantity === 1 ? "#EF4444" : "#F97316" }}
+                style={{ backgroundColor: quantity === 1 ? "#FEE2E2" : "white", color: quantity === 1 ? "#EF4444" : "#4CAF50" }}
               >
                 {quantity === 1
                   ? <Trash2 size={12} strokeWidth={2.5} />
@@ -169,7 +169,7 @@ export function CartItem({ product, quantity, onAdd, onRemove, onDelete }: CartI
               </button>
               <span
                 className="w-5 text-center text-sm font-black tabular-nums leading-none"
-                style={{ color: "#F97316" }}
+                style={{ color: "#4CAF50" }}
               >
                 {quantity}
               </span>
@@ -177,7 +177,7 @@ export function CartItem({ product, quantity, onAdd, onRemove, onDelete }: CartI
                 onClick={() => onAdd(product)}
                 aria-label={`Agregar otro ${product.name}`}
                 className="w-7 h-7 rounded-full flex items-center justify-center text-white active:scale-90 transition-transform duration-150"
-                style={{ backgroundColor: "#F97316" }}
+                style={{ backgroundColor: "#4CAF50" }}
               >
                 <Plus size={13} strokeWidth={2.5} />
               </button>

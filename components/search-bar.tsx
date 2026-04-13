@@ -21,7 +21,7 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className="w-full bg-card border border-border rounded-xl pl-10 pr-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-colors"
-          style={{ "--tw-ring-color": "#F97316" } as React.CSSProperties}
+          style={{ "--tw-ring-color": "#4CAF50" } as React.CSSProperties}
         />
       </div>
       <button

@@ -33,7 +33,7 @@ export function FilterChips({ active, onChange }: FilterChipsProps) {
             )}
             style={
               isActive
-                ? { backgroundColor: "#F97316", borderColor: "#F97316" }
+                ? { backgroundColor: "#4CAF50", borderColor: "#4CAF50" }
                 : {}
             }
           >

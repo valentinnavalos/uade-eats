@@ -124,7 +124,7 @@ export default function CartPage() {
                   className="flex items-center gap-1 mt-0.5 group"
                   aria-label={`Ver ${STORE_NAME}`}
                 >
-                  <Store size={11} style={{ color: "#F97316" }} />
+                  <Store size={11} style={{ color: "#4CAF50" }} />
                   <span className="text-xs text-muted-foreground group-hover:underline leading-none">
                     {STORE_NAME}
                   </span>
@@ -136,7 +136,7 @@ export default function CartPage() {
             {!isEmpty && (
               <span
                 className="shrink-0 px-2.5 py-1 rounded-full text-xs font-bold text-white"
-                style={{ backgroundColor: "#F97316" }}
+                style={{ backgroundColor: "#4CAF50" }}
               >
                 {cartCount} {cartCount === 1 ? "ítem" : "ítems"}
               </span>
@@ -151,9 +151,9 @@ export default function CartPage() {
           <>
             <main className="flex-1 overflow-y-auto pb-[272px]">
               {/* Swipe hint */}
-              <div className="flex items-center gap-1.5 mx-4 mt-4 mb-3 px-3 py-2 rounded-xl" style={{ backgroundColor: "#FFF0E6" }}>
-                <Info size={13} style={{ color: "#F97316" }} />
-                <p className="text-xs font-medium" style={{ color: "#C2410C" }}>
+              <div className="flex items-center gap-1.5 mx-4 mt-4 mb-3 px-3 py-2 rounded-xl" style={{ backgroundColor: "#F0FDF4" }}>
+                <Info size={13} style={{ color: "#4CAF50" }} />
+                <p className="text-xs font-medium" style={{ color: "#166534" }}>
                   Deslizá hacia la izquierda para eliminar un producto
                 </p>
               </div>
@@ -185,7 +185,7 @@ export default function CartPage() {
                   rows={2}
                   placeholder="Ej: sin azúcar, sin cebolla…"
                   className="w-full resize-none rounded-2xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 leading-relaxed"
-                  style={{ "--tw-ring-color": "#F97316" } as React.CSSProperties}
+                  style={{ "--tw-ring-color": "#4CAF50" } as React.CSSProperties}
                 />
               </div>
             </main>
@@ -206,7 +206,7 @@ export default function CartPage() {
                   <span className="text-muted-foreground">Costo de servicio</span>
                   <span
                     className="font-semibold text-xs px-2 py-0.5 rounded-full"
-                    style={{ backgroundColor: "#F0FDF4", color: "#16A34A" }}
+                    style={{ backgroundColor: "#F7FEE7", color: "#16A34A" }}
                   >
                     Gratis
                   </span>
@@ -225,7 +225,7 @@ export default function CartPage() {
               <button
                 onClick={handleConfirm}
                 className="w-full flex items-center justify-between px-6 py-4 rounded-2xl text-white font-bold shadow-lg active:scale-[0.98] transition-transform duration-150"
-                style={{ backgroundColor: "#F97316" }}
+                style={{ backgroundColor: "#4CAF50" }}
                 aria-label="Confirmar pedido"
               >
                 <span className="text-base">Confirmar pedido</span>

@@ -77,7 +77,7 @@ export default function ProfilePage() {
             {/* Avatar */}
             <div
               className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black text-white shrink-0"
-              style={{ backgroundColor: "#F97316" }}
+              style={{ backgroundColor: "#4CAF50" }}
             >
               VN
             </div>
@@ -87,7 +87,7 @@ export default function ProfilePage() {
               <p className="text-xs text-muted-foreground mt-0.5">vonneumann@uade.edu.ar</p>
               <div
                 className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold"
-                style={{ backgroundColor: "#FFF0E6", color: "#F97316" }}
+                style={{ backgroundColor: "#F0FDF4", color: "#4CAF50" }}
               >
                 <span>ID</span>
                 <span>· 1234567</span>

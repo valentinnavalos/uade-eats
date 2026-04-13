@@ -29,7 +29,7 @@ export function CategoryTabs({ categories, active, onChange }: CategoryTabsProps
                 ? "border-current font-bold"
                 : "border-transparent text-muted-foreground hover:text-foreground"
             )}
-            style={isActive ? { color: "#F97316", borderColor: "#F97316" } : {}}
+            style={isActive ? { color: "#4CAF50", borderColor: "#4CAF50" } : {}}
           >
             {cat}
           </button>

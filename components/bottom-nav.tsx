@@ -30,7 +30,7 @@ export function BottomNav({ active, onChange, cartCount = 0, cartBump = false }:
               "flex-1 flex flex-col items-center justify-center gap-1 py-3 px-2 relative transition-colors duration-150",
               isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
             )}
-            style={isActive ? { color: "#F97316" } : {}}
+            style={isActive ? { color: "#4CAF50" } : {}}
             aria-current={isActive ? "page" : undefined}
           >
             <div className="relative">
@@ -44,7 +44,7 @@ export function BottomNav({ active, onChange, cartCount = 0, cartBump = false }:
                     "absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-0.5 rounded-full text-[10px] font-bold text-white flex items-center justify-center transition-transform duration-150",
                     cartBump ? "scale-125" : "scale-100"
                   )}
-                  style={{ backgroundColor: "#F97316" }}
+                  style={{ backgroundColor: "#4CAF50" }}
                 >
                   {cartCount}
                 </span>
