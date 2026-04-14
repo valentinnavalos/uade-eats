@@ -89,8 +89,7 @@ export default function CartPage() {
   }, [])
 
   const handleConfirm = () => {
-    // Navigate to confirmation / checkout
-    alert("¡Pedido confirmado! (integración pendiente)")
+    router.push("/checkout")
   }
 
   const isEmpty = cartItems.length === 0
