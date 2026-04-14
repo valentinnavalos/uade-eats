@@ -3,10 +3,13 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useReducer,
+  useRef,
   type ReactNode,
 } from "react"
 import type {
+  AuthStatus,
   User,
   Product,
   CartItem,
@@ -21,6 +24,7 @@ import { MOCK_USER } from "@/lib/mock-data"
 // ---------------------------------------------------------------------------
 
 interface AppState {
+  authStatus: AuthStatus
   user: User | null
   cart: {
     storeId: string | null
@@ -31,8 +35,8 @@ interface AppState {
 }
 
 const initialState: AppState = {
-  // TODO: replace with API call (fetch current user session)
-  user: MOCK_USER,
+  authStatus: "unauthenticated",
+  user: null,
   cart: { storeId: null, items: [] },
   orders: [],
   activeOrderId: null,
@@ -45,6 +49,8 @@ const initialState: AppState = {
 type AppAction =
   | { type: "SET_USER"; payload: User }
   | { type: "CLEAR_USER" }
+  | { type: "LOGIN"; payload: { email: string } }
+  | { type: "LOGOUT" }
   | { type: "ADD_TO_CART"; payload: { product: Product; storeId: string } }
   | { type: "REMOVE_FROM_CART"; payload: { productId: string } }
   | { type: "UPDATE_QUANTITY"; payload: { productId: string; quantity: number } }
@@ -64,6 +70,22 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
     case "CLEAR_USER":
       return { ...state, user: null }
+
+    case "LOGIN": {
+      // TODO: replace with real auth provider
+      const email = action.payload.email.toLowerCase().trim()
+      if (!email.endsWith("@uade.edu.ar")) return state
+      return { ...state, user: MOCK_USER, authStatus: "authenticated" }
+    }
+
+    case "LOGOUT":
+      return {
+        ...state,
+        user: null,
+        authStatus: "unauthenticated",
+        cart: { storeId: null, items: [] },
+        activeOrderId: null,
+      }
 
     case "ADD_TO_CART": {
       const { product, storeId } = action.payload
@@ -205,6 +227,28 @@ export function AppProvider({ children }: { children: ReactNode }) {
     (sum, item) => sum + item.quantity,
     0
   )
+
+  // On mount: restore session from cookie so a full page reload keeps the user logged in
+  useEffect(() => {
+    if (document.cookie.includes("uade-eats-auth=1")) {
+      dispatch({ type: "LOGIN", payload: { email: MOCK_USER.email } })
+    }
+  }, [])
+
+  // Sync cookie whenever authStatus changes, but skip the initial render to
+  // avoid immediately clearing the cookie before the restore effect above runs
+  const isMounted = useRef(false)
+  useEffect(() => {
+    if (!isMounted.current) {
+      isMounted.current = true
+      return
+    }
+    if (state.authStatus === "authenticated") {
+      document.cookie = "uade-eats-auth=1; path=/"
+    } else {
+      document.cookie = "uade-eats-auth=; path=/; max-age=0"
+    }
+  }, [state.authStatus])
 
   return (
     <AppContext.Provider value={{ state, dispatch, cartCount }}>

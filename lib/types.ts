@@ -9,6 +9,8 @@ export type OrderStatus = "pending" | "preparing" | "ready" | "completed"
 
 export type PaymentMethod = "mercadopago" | "efectivo"
 
+export type AuthStatus = "unauthenticated" | "authenticated"
+
 export interface Store {
   id: string
   name: string
@@ -52,5 +54,5 @@ export interface User {
   name: string
   email: string
   legajo: string
-  role: string
+  role: "student" | "faculty" | "staff"
 }

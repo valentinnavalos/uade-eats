@@ -20,6 +20,7 @@ interface SettingItem {
   icon: React.ElementType
   label: string
   destructive?: boolean
+  onClick?: () => void
 }
 
 interface SettingGroup {
@@ -57,8 +58,13 @@ const SETTINGS: SettingGroup[] = [
 
 export default function ProfilePage() {
   const router = useRouter()
-  const { state, cartCount } = useApp()
+  const { state, dispatch, cartCount } = useApp()
   const [activeNav] = useState("profile")
+
+  const handleLogout = () => {
+    dispatch({ type: "LOGOUT" })
+    window.location.replace("/login")
+  }
 
   // TODO: replace with API call (fetch user profile)
   const user = state.user
@@ -111,7 +117,12 @@ export default function ProfilePage() {
           </div>
 
           {/* Settings groups */}
-          {SETTINGS.map((group) => (
+          {SETTINGS.map((group) => {
+            const items = group.items.map((item) =>
+              item.destructive ? { ...item, onClick: handleLogout } : item
+            )
+            return { ...group, items }
+          }).map((group) => (
             <section key={group.title}>
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 px-1">
                 {group.title}
@@ -120,6 +131,7 @@ export default function ProfilePage() {
                 {group.items.map((item) => (
                   <button
                     key={item.label}
+                    onClick={item.onClick}
                     className={cn(
                       "w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/40 transition-colors active:scale-[0.99] text-left",
                       item.destructive && "hover:bg-red-50"
