@@ -4,136 +4,66 @@ import { useState, useMemo, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { ArrowLeft, Star, Clock, ShoppingBag } from "lucide-react"
-import { ProductCard, type Product } from "@/components/product-card"
+import { ProductCard } from "@/components/product-card"
 import { CategoryTabs } from "@/components/category-tabs"
 import { BottomNav } from "@/components/bottom-nav"
+import type { Product } from "@/lib/types"
+// TODO: replace with API call
+import { MOCK_STORES, MOCK_PRODUCTS } from "@/lib/mock-data"
+import { useApp } from "@/context/AppContext"
 
-// ── Store meta ──────────────────────────────────────────────────────────────
-const STORE = {
-  name: "Cafetería Pepe",
-  tagline: "El mejor café del campus",
-  rating: 4.8,
-  reviewCount: 312,
-  waitTime: "5–10 min",
-  image: "/images/cafeteria-pepe.jpg",
-  isOpen: true,
-}
-
-// ── Product catalog ──────────────────────────────────────────────────────────
-const PRODUCTS: Product[] = [
-  // Bebidas
-  {
-    id: "b1",
-    name: "Café con Leche",
-    description: "Espresso doble con leche entera vaporizada. El clásico que no falla.",
-    price: 1800,
-    image: "/images/products/cafe-con-leche.jpg",
-    category: "Bebidas",
-  },
-  {
-    id: "b2",
-    name: "Jugo de Naranja",
-    description: "Exprimido al momento con naranjas frescas, sin azúcar agregada.",
-    price: 1500,
-    image: "/images/products/jugo-naranja.jpg",
-    category: "Bebidas",
-  },
-  {
-    id: "b3",
-    name: "Mate Cocido",
-    description: "Con leche o sin leche. Servido en taza grande con dos sobres.",
-    price: 1200,
-    image: "/images/products/mate-cocido.jpg",
-    category: "Bebidas",
-  },
-  // Sándwiches
-  {
-    id: "s1",
-    name: "Tostado Mixto",
-    description: "Jamón cocido y queso cremoso en pan lactal tostado. Crocante por fuera.",
-    price: 2400,
-    image: "/images/products/tostado-mixto.jpg",
-    category: "Sándwiches",
-  },
-  {
-    id: "s2",
-    name: "Sándwich Veggie",
-    description: "Palta, tomate cherry, lechuga y queso en pan integral artesanal.",
-    price: 2800,
-    image: "/images/products/sandwich-veggie.jpg",
-    category: "Sándwiches",
-  },
-  // Snacks
-  {
-    id: "sn1",
-    name: "Medialunas (x3)",
-    description: "Recién horneadas, glaseadas con miel. Perfectas para el recreo.",
-    price: 1600,
-    image: "/images/products/medialunas.jpg",
-    category: "Snacks",
-  },
-  {
-    id: "sn2",
-    name: "Facturas Surtidas",
-    description: "Selección de vigilantes, cañones y palmeritas. Porción para dos.",
-    price: 2200,
-    image: "/images/products/facturas.jpg",
-    category: "Snacks",
-  },
-  // Postres
-  {
-    id: "p1",
-    name: "Brownie de Chocolate",
-    description: "Húmedo y fundente, con pepitas de chocolate. Servido tibio.",
-    price: 1900,
-    image: "/images/products/brownie.jpg",
-    category: "Postres",
-  },
-]
-
-const CATEGORIES = ["Bebidas", "Sándwiches", "Snacks", "Postres"]
-
-// ── Cart state type ───────────────────────────────────────────────────────────
-type CartMap = Record<string, number>
+const STORE_ID = "store-1"
 
 export default function StorePage() {
   const router = useRouter()
+  const { state, dispatch, cartCount } = useApp()
   const [activeCategory, setActiveCategory] = useState("Bebidas")
   const [activeNav, setActiveNav] = useState("home")
-  const [cart, setCart] = useState<CartMap>({})
-  const [cartBump, setCartBump] = useState(false)
 
-  // Derived: total items in cart
-  const cartCount = useMemo(
-    () => Object.values(cart).reduce((sum, q) => sum + q, 0),
-    [cart]
+  // TODO: replace with API call (fetch store by id)
+  const storeData = MOCK_STORES.find((s) => s.id === STORE_ID)!
+  // TODO: replace with API call (fetch products by storeId)
+  const storeProducts = MOCK_PRODUCTS.filter((p) => p.storeId === STORE_ID)
+
+  const categories = useMemo(
+    () => Array.from(new Set(storeProducts.map((p) => p.category))),
+    [storeProducts]
   )
 
-  // Derived: filtered products
   const visibleProducts = useMemo(
-    () => PRODUCTS.filter((p) => p.category === activeCategory),
-    [activeCategory]
+    () => storeProducts.filter((p) => p.category === activeCategory),
+    [storeProducts, activeCategory]
   )
 
-  // Cart actions
-  const handleAdd = useCallback((product: Product) => {
-    setCart((prev) => ({ ...prev, [product.id]: (prev[product.id] ?? 0) + 1 }))
-    // Trigger badge bump animation
-    setCartBump(true)
-    setTimeout(() => setCartBump(false), 300)
-  }, [])
+  const getQuantity = useCallback(
+    (productId: string): number =>
+      state.cart.items.find((i) => i.product.id === productId)?.quantity ?? 0,
+    [state.cart.items]
+  )
 
-  const handleRemove = useCallback((product: Product) => {
-    setCart((prev) => {
-      const next = { ...prev }
-      if ((next[product.id] ?? 0) <= 1) {
-        delete next[product.id]
+  const cartTotal = state.cart.items.reduce(
+    (sum, item) => sum + item.quantity * item.product.price,
+    0
+  )
+
+  const handleAdd = useCallback(
+    (product: Product) => {
+      dispatch({ type: "ADD_TO_CART", payload: { product, storeId: STORE_ID } })
+    },
+    [dispatch]
+  )
+
+  const handleRemove = useCallback(
+    (product: Product) => {
+      const qty = getQuantity(product.id)
+      if (qty <= 1) {
+        dispatch({ type: "REMOVE_FROM_CART", payload: { productId: product.id } })
       } else {
-        next[product.id] -= 1
+        dispatch({ type: "UPDATE_QUANTITY", payload: { productId: product.id, quantity: qty - 1 } })
       }
-      return next
-    })
-  }, [])
+    },
+    [dispatch, getQuantity]
+  )
 
   return (
     <div className="min-h-svh flex flex-col items-center" style={{ backgroundColor: "var(--brand-surface)" }}>
@@ -153,29 +83,29 @@ export default function StorePage() {
             </a>
             <div className="flex-1 min-w-0">
               <h1 className="font-black text-lg text-foreground leading-tight truncate">
-                {STORE.name}
+                {storeData.name}
               </h1>
               <p className="text-xs text-muted-foreground leading-none mt-0.5 truncate">
-                {STORE.tagline}
+                {storeData.tagline}
               </p>
             </div>
             {/* Open badge */}
             <span
               className="shrink-0 px-2.5 py-1 rounded-full text-xs font-bold"
               style={
-                STORE.isOpen
+                storeData.isOpen
                   ? { backgroundColor: "#DCFCE7", color: "#16A34A" }
                   : { backgroundColor: "#F3F4F6", color: "#6B7280" }
               }
             >
-              {STORE.isOpen ? "Abierto" : "Cerrado"}
+              {storeData.isOpen ? "Abierto" : "Cerrado"}
             </span>
           </div>
 
           {/* Category tabs */}
           <div className="px-4 pb-0">
             <CategoryTabs
-              categories={CATEGORIES}
+              categories={categories}
               active={activeCategory}
               onChange={setActiveCategory}
             />
@@ -188,8 +118,8 @@ export default function StorePage() {
           {/* Hero image */}
           <div className="relative w-full h-48 overflow-hidden">
             <Image
-              src={STORE.image}
-              alt={`${STORE.name} — foto del local`}
+              src={storeData.imageUrl}
+              alt={`${storeData.name} — foto del local`}
               fill
               className="object-cover"
               sizes="(max-width: 480px) 100vw, 480px"
@@ -202,12 +132,11 @@ export default function StorePage() {
             <div className="absolute bottom-3 left-4 flex items-center gap-3">
               <div className="flex items-center gap-1 bg-black/50 backdrop-blur-sm rounded-full px-2.5 py-1">
                 <Star size={11} fill="#F97316" stroke="none" />
-                <span className="text-white text-xs font-bold">{STORE.rating}</span>
-                <span className="text-white/70 text-xs">({STORE.reviewCount})</span>
+                <span className="text-white text-xs font-bold">{storeData.rating}</span>
               </div>
               <div className="flex items-center gap-1.5 bg-black/50 backdrop-blur-sm rounded-full px-2.5 py-1">
                 <Clock size={11} className="text-white/80" />
-                <span className="text-white text-xs font-semibold">{STORE.waitTime}</span>
+                <span className="text-white text-xs font-semibold">{storeData.estimatedWaitMinutes} min</span>
               </div>
             </div>
           </div>
@@ -226,7 +155,7 @@ export default function StorePage() {
                 <ProductCard
                   key={product.id}
                   product={product}
-                  quantity={cart[product.id] ?? 0}
+                  quantity={getQuantity(product.id)}
                   onAdd={handleAdd}
                   onRemove={handleRemove}
                 />
@@ -252,11 +181,7 @@ export default function StorePage() {
                     {cartCount} {cartCount === 1 ? "ítem" : "ítems"}
                   </span>
                   <span className="text-sm font-black">
-                    $
-                    {PRODUCTS.reduce(
-                      (sum, p) => sum + (cart[p.id] ?? 0) * p.price,
-                      0
-                    ).toLocaleString("es-AR")}
+                    ${cartTotal.toLocaleString("es-AR")}
                   </span>
                 </div>
               </button>
@@ -275,7 +200,6 @@ export default function StorePage() {
             if (id === "profile") router.push("/profile")
           }}
           cartCount={cartCount}
-          cartBump={cartBump}
         />
       </div>
     </div>

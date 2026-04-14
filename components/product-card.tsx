@@ -2,16 +2,9 @@
 
 import Image from "next/image"
 import { Plus, Minus } from "lucide-react"
-import { cn } from "@/lib/utils"
+import type { Product } from "@/lib/types"
 
-export interface Product {
-  id: string
-  name: string
-  description: string
-  price: number
-  image: string
-  category: string
-}
+export type { Product }
 
 interface ProductCardProps {
   product: Product
@@ -28,7 +21,7 @@ export function ProductCard({ product, quantity, onAdd, onRemove }: ProductCardP
       {/* Thumbnail */}
       <div className="relative w-20 h-20 shrink-0 rounded-xl overflow-hidden">
         <Image
-          src={product.image}
+          src={product.imageUrl}
           alt={product.name}
           fill
           className="object-cover"

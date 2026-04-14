@@ -14,6 +14,7 @@ import {
 } from "lucide-react"
 import { BottomNav } from "@/components/bottom-nav"
 import { cn } from "@/lib/utils"
+import { useApp } from "@/context/AppContext"
 
 interface SettingItem {
   icon: React.ElementType
@@ -56,7 +57,14 @@ const SETTINGS: SettingGroup[] = [
 
 export default function ProfilePage() {
   const router = useRouter()
+  const { state, cartCount } = useApp()
   const [activeNav] = useState("profile")
+
+  // TODO: replace with API call (fetch user profile)
+  const user = state.user
+  const initials = user
+    ? user.name.split(" ").map((w) => w[0]).slice(0, 2).join("")
+    : "?"
 
   return (
     <div className="min-h-svh flex flex-col items-center" style={{ backgroundColor: "var(--brand-surface)" }}>
@@ -79,18 +87,18 @@ export default function ProfilePage() {
               className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black text-white shrink-0"
               style={{ backgroundColor: "#F97316" }}
             >
-              VN
+              {initials}
             </div>
 
             <div className="flex-1 min-w-0">
-              <p className="font-black text-base text-foreground leading-tight">John Von Neumann</p>
-              <p className="text-xs text-muted-foreground mt-0.5">vonneumann@uade.edu.ar</p>
+              <p className="font-black text-base text-foreground leading-tight">{user?.name}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{user?.email}</p>
               <div
                 className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold"
                 style={{ backgroundColor: "#FFF0E6", color: "#F97316" }}
               >
                 <span>ID</span>
-                <span>· 1234567</span>
+                <span>· {user?.legajo}</span>
               </div>
             </div>
 
@@ -154,6 +162,7 @@ export default function ProfilePage() {
         {/* ── Bottom Navigation ── */}
         <BottomNav
           active={activeNav}
+          cartCount={cartCount}
           onChange={(id) => {
             if (id === "home") router.push("/")
             if (id === "cart") router.push("/cart")

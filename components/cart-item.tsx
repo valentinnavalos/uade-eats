@@ -118,7 +118,7 @@ export function CartItem({ product, quantity, onAdd, onRemove, onDelete }: CartI
         {/* Thumbnail */}
         <div className="relative w-20 h-20 shrink-0 rounded-xl overflow-hidden">
           <Image
-            src={product.image}
+            src={product.imageUrl}
             alt={product.name}
             fill
             className="object-cover"

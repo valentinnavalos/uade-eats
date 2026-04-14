@@ -1,98 +1,66 @@
 "use client"
 
-import { useState, useMemo, useCallback } from "react"
+import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, Store, ChevronRight, Info } from "lucide-react"
 import { CartItem } from "@/components/cart-item"
 import { CartEmpty } from "@/components/cart-empty"
 import { BottomNav } from "@/components/bottom-nav"
-import type { Product } from "@/components/product-card"
-
-// ── Mock cart data ────────────────────────────────────────────────────────────
-// In a real app this would come from a global cart store / context
-const INITIAL_PRODUCTS: Product[] = [
-  {
-    id: "b1",
-    name: "Café con Leche",
-    description: "Espresso doble con leche entera vaporizada.",
-    price: 1800,
-    image: "/images/products/cafe-con-leche.jpg",
-    category: "Bebidas",
-  },
-  {
-    id: "s1",
-    name: "Tostado Mixto",
-    description: "Jamón cocido y queso cremoso en pan lactal tostado.",
-    price: 2400,
-    image: "/images/products/tostado-mixto.jpg",
-    category: "Sándwiches",
-  },
-  {
-    id: "sn1",
-    name: "Medialunas (x3)",
-    description: "Recién horneadas, glaseadas con miel.",
-    price: 1600,
-    image: "/images/products/medialunas.jpg",
-    category: "Snacks",
-  },
-]
-
-type CartMap = Record<string, number>
-const INITIAL_CART: CartMap = { b1: 2, s1: 1, sn1: 3 }
-
-const STORE_NAME = "Cafetería Pepe"
+import type { Product } from "@/lib/types"
+// TODO: replace with API call
+import { MOCK_STORES } from "@/lib/mock-data"
+import { useApp } from "@/context/AppContext"
 
 export default function CartPage() {
   const router = useRouter()
+  const { state, dispatch, cartCount } = useApp()
   const [activeNav, setActiveNav] = useState("cart")
-  const [cart, setCart] = useState<CartMap>(INITIAL_CART)
-  const [products] = useState<Product[]>(INITIAL_PRODUCTS)
 
-  // Derived: only items present in cart
-  const cartItems = useMemo(
-    () => products.filter((p) => (cart[p.id] ?? 0) > 0),
-    [products, cart]
+  const cartItems = state.cart.items
+  const storeName = state.cart.storeId
+    ? (MOCK_STORES.find((s) => s.id === state.cart.storeId)?.name ?? "")
+    : ""
+  const subtotal = cartItems.reduce(
+    (sum, item) => sum + item.quantity * item.product.price,
+    0
+  )
+  const isEmpty = cartItems.length === 0
+
+  const handleAdd = useCallback(
+    (product: Product) => {
+      if (!state.cart.storeId) return
+      dispatch({ type: "ADD_TO_CART", payload: { product, storeId: state.cart.storeId } })
+    },
+    [dispatch, state.cart.storeId]
   )
 
-  const cartCount = useMemo(
-    () => Object.values(cart).reduce((sum, q) => sum + q, 0),
-    [cart]
-  )
-
-  const subtotal = useMemo(
-    () => products.reduce((sum, p) => sum + (cart[p.id] ?? 0) * p.price, 0),
-    [products, cart]
-  )
-
-  const handleAdd = useCallback((product: Product) => {
-    setCart((prev) => ({ ...prev, [product.id]: (prev[product.id] ?? 0) + 1 }))
-  }, [])
-
-  const handleRemove = useCallback((product: Product) => {
-    setCart((prev) => {
-      const next = { ...prev }
-      if ((next[product.id] ?? 0) <= 1) {
-        delete next[product.id]
+  const handleRemove = useCallback(
+    (product: Product) => {
+      const item = cartItems.find((i) => i.product.id === product.id)
+      const qty = item?.quantity ?? 0
+      if (qty <= 1) {
+        dispatch({ type: "REMOVE_FROM_CART", payload: { productId: product.id } })
       } else {
-        next[product.id] -= 1
+        dispatch({ type: "UPDATE_QUANTITY", payload: { productId: product.id, quantity: qty - 1 } })
       }
-      return next
-    })
-  }, [])
+    },
+    [dispatch, cartItems]
+  )
 
-  const handleDelete = useCallback((product: Product) => {
-    setCart((prev) => {
-      const next = { ...prev }
-      delete next[product.id]
-      return next
-    })
-  }, [])
+  const handleDelete = useCallback(
+    (product: Product) => {
+      dispatch({ type: "REMOVE_FROM_CART", payload: { productId: product.id } })
+    },
+    [dispatch]
+  )
 
   const handleConfirm = () => {
+    dispatch({
+      type: "PLACE_ORDER",
+      payload: { storeName, paymentMethod: "efectivo" },
+    })
     router.push("/checkout")
   }
-
-  const isEmpty = cartItems.length === 0
 
   return (
     <div
@@ -117,15 +85,15 @@ export default function CartPage() {
               <h1 className="font-black text-xl text-foreground leading-tight">
                 Tu pedido
               </h1>
-              {!isEmpty && (
+              {!isEmpty && storeName && (
                 <button
                   onClick={() => router.push("/store")}
                   className="flex items-center gap-1 mt-0.5 group"
-                  aria-label={`Ver ${STORE_NAME}`}
+                  aria-label={`Ver ${storeName}`}
                 >
                   <Store size={11} style={{ color: "#F97316" }} />
                   <span className="text-xs text-muted-foreground group-hover:underline leading-none">
-                    {STORE_NAME}
+                    {storeName}
                   </span>
                   <ChevronRight size={11} className="text-muted-foreground" />
                 </button>
@@ -159,11 +127,11 @@ export default function CartPage() {
 
               {/* Cart item list */}
               <section className="px-4 space-y-3" aria-label="Productos en el carrito">
-                {cartItems.map((product) => (
+                {cartItems.map((item) => (
                   <CartItem
-                    key={product.id}
-                    product={product}
-                    quantity={cart[product.id] ?? 0}
+                    key={item.product.id}
+                    product={item.product}
+                    quantity={item.quantity}
                     onAdd={handleAdd}
                     onRemove={handleRemove}
                     onDelete={handleDelete}
