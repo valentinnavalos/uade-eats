@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import {
   ArrowLeft,
@@ -13,17 +13,7 @@ import {
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { BottomNav } from "@/components/bottom-nav"
-
-// ── Mock data ─────────────────────────────────────────────────────────────────
-// Mirrors the cart mock so the data appears to flow through seamlessly
-const MOCK_STORE = "Cafetería Central"
-const MOCK_STORE_SUBTITLE = "Cafetería UADE"
-
-const MOCK_ITEMS = [
-  { id: "b1",  name: "Café con Leche", quantity: 2, unitPrice: 1800 },
-  { id: "s1",  name: "Tostado Mixto",  quantity: 1, unitPrice: 2500 },
-  { id: "sn1", name: "Medialunas",     quantity: 3, unitPrice: 800  },
-]
+import { useApp } from "@/context/AppContext"
 
 type PaymentId = "mercadopago" | "efectivo" | "tarjeta"
 
@@ -108,16 +98,34 @@ function StepIndicator({ step }: { step: 1 | 2 }) {
 
 export default function CheckoutPage() {
   const router = useRouter()
+  const { state } = useApp()
   const [step, setStep] = useState<1 | 2>(1)
   const [selectedPayment, setSelectedPayment] = useState<PaymentId>("efectivo")
   const [isProcessing, setIsProcessing] = useState(false)
   const [activeNav, setActiveNav] = useState("cart")
 
-  const subtotal = useMemo(
-    () => MOCK_ITEMS.reduce((acc, item) => acc + item.quantity * item.unitPrice, 0),
-    []
-  )
-  const total = subtotal // service fee is free
+  // TODO: replace with API call (fetch order by activeOrderId)
+  const activeOrder = state.activeOrderId
+    ? state.orders.find((o) => o.id === state.activeOrderId) ?? null
+    : null
+
+  // Guard: if no active order, redirect to cart
+  useEffect(() => {
+    if (!activeOrder) {
+      router.replace("/cart")
+    }
+  }, [activeOrder, router])
+
+  if (!activeOrder) return null
+
+  const total = activeOrder.total
+
+  const orderItems = activeOrder.items.map((ci) => ({
+    id: ci.product.id,
+    name: ci.product.name,
+    quantity: ci.quantity,
+    unitPrice: ci.product.price,
+  }))
 
   const handleBack = useCallback(() => {
     if (step === 1) router.back()
@@ -134,11 +142,11 @@ export default function CheckoutPage() {
     setTimeout(() => {
       router.push("/orders")
       toast.success("¡Pedido confirmado!", {
-        description: `Tu pedido fue recibido por ${MOCK_STORE}`,
+        description: `Tu pedido fue recibido por ${activeOrder.storeName}`,
         duration: 4000,
       })
     }, 1500)
-  }, [isProcessing, router])
+  }, [isProcessing, router, activeOrder.storeName])
 
   const stepTitle = step === 1 ? "Resumen del pedido" : "Método de pago"
 
@@ -172,7 +180,12 @@ export default function CheckoutPage() {
           className="flex-1 pb-[220px] animate-in fade-in slide-in-from-right-4 duration-200"
         >
           {step === 1 ? (
-            <Step1Content subtotal={subtotal} total={total} />
+            <Step1Content
+              storeName={activeOrder.storeName}
+              items={orderItems}
+              subtotal={total}
+              total={total}
+            />
           ) : (
             <Step2Content
               selectedPayment={selectedPayment}
@@ -225,7 +238,17 @@ export default function CheckoutPage() {
 
 // ── Step 1: Order Summary ─────────────────────────────────────────────────────
 
-function Step1Content({ subtotal, total }: { subtotal: number; total: number }) {
+function Step1Content({
+  storeName,
+  items,
+  subtotal,
+  total,
+}: {
+  storeName: string
+  items: Array<{ id: string; name: string; quantity: number; unitPrice: number }>
+  subtotal: number
+  total: number
+}) {
   return (
     <div className="pt-2 space-y-3">
       {/* Store card */}
@@ -237,8 +260,7 @@ function Step1Content({ subtotal, total }: { subtotal: number; total: number }) 
           <Store size={20} color="#F97316" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-bold text-[#1C1917] text-sm leading-tight">{MOCK_STORE}</p>
-          <p className="text-xs text-[#6B7280] mt-0.5">{MOCK_STORE_SUBTITLE}</p>
+          <p className="font-bold text-[#1C1917] text-sm leading-tight">{storeName}</p>
         </div>
       </div>
 
@@ -248,7 +270,7 @@ function Step1Content({ subtotal, total }: { subtotal: number; total: number }) 
           Tu pedido
         </p>
         <div className="bg-white rounded-2xl border border-[#F3F4F6] divide-y divide-[#F9F9F9] shadow-sm overflow-hidden">
-          {MOCK_ITEMS.map((item) => (
+          {items.map((item) => (
             <div key={item.id} className="flex items-center gap-3 px-4 py-3">
               <span
                 className="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold text-white flex-shrink-0"

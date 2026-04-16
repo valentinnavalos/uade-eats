@@ -4,18 +4,9 @@ import Image from "next/image"
 import Link from "next/link"
 import { Clock, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
+import type { Store } from "@/lib/types"
 
-export interface Store {
-  id: string
-  name: string
-  tagline: string
-  category: string
-  waitTime: string
-  isOpen: boolean
-  image: string
-  rating: number
-  reviewCount: number
-}
+export type { Store }
 
 interface StoreCardProps {
   store: Store
@@ -32,7 +23,7 @@ export function StoreCard({ store, onClick }: StoreCardProps) {
       {/* Food image */}
       <div className="relative w-full h-44 overflow-hidden">
         <Image
-          src={store.image}
+          src={store.imageUrl}
           alt={store.name}
           fill
           className="object-cover"
@@ -75,12 +66,11 @@ export function StoreCard({ store, onClick }: StoreCardProps) {
             <span className="text-sm font-semibold text-foreground">
               {store.rating.toFixed(1)}
             </span>
-            <span className="text-xs text-muted-foreground">({store.reviewCount})</span>
           </div>
 
           <div className="flex items-center gap-1 text-muted-foreground">
             <Clock size={13} className="shrink-0" />
-            <span className="text-sm">{store.waitTime}</span>
+            <span className="text-sm">{store.estimatedWaitMinutes} min</span>
           </div>
         </div>
       </div>

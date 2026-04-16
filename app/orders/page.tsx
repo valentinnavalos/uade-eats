@@ -5,93 +5,43 @@ import { useRouter } from "next/navigation"
 import { Bell, ChevronRight, Clock, MapPin, CheckCircle2, Loader2 } from "lucide-react"
 import { BottomNav } from "@/components/bottom-nav"
 import { cn } from "@/lib/utils"
-
-type OrderStatus = "preparing" | "ready"
-type HistoryStatus = "completed" | "cancelled"
-
-interface ActiveOrder {
-  id: string
-  code: number
-  store: string
-  storeCategory: string
-  items: string
-  total: number
-  status: OrderStatus
-  estimatedMinutes?: number
-  placedAt: string
-}
-
-interface PastOrder {
-  id: string
-  store: string
-  items: string
-  total: number
-  date: string
-  status: HistoryStatus
-}
-
-const ACTIVE_ORDERS: ActiveOrder[] = [
-  {
-    id: "o1",
-    code: 42,
-    store: "Cafetería Pepe",
-    storeCategory: "cafetería",
-    items: "Café con Leche × 2, Medialuna × 1",
-    total: 5600,
-    status: "preparing",
-    estimatedMinutes: 8,
-    placedAt: "12:34",
-  },
-  {
-    id: "o2",
-    code: 17,
-    store: "Kiosco Norte",
-    storeCategory: "kiosco",
-    items: "Agua mineral × 2, Alfajor × 1",
-    total: 2800,
-    status: "ready",
-    placedAt: "12:20",
-  },
-]
-
-const PAST_ORDERS: PastOrder[] = [
-  {
-    id: "h1",
-    store: "Buffet La Cantina",
-    items: "Milanesa completa, Jugo de naranja",
-    total: 7200,
-    date: "Ayer, 13:15",
-    status: "completed",
-  },
-  {
-    id: "h2",
-    store: "Pastelería Claudio",
-    items: "Brownie × 2, Café cortado",
-    total: 4600,
-    date: "Lun 7 abr, 10:02",
-    status: "completed",
-  },
-  {
-    id: "h3",
-    store: "Cafetería Pepe",
-    items: "Mate cocido, Facturas × 3",
-    total: 5000,
-    date: "Vie 4 abr, 09:45",
-    status: "cancelled",
-  },
-]
+import type { Order, OrderStatus } from "@/lib/types"
+// TODO: replace with API call
+import { MOCK_STORES } from "@/lib/mock-data"
+import { useApp } from "@/context/AppContext"
 
 const STEPS = ["Recibido", "En preparación", "Listo"]
 
 function stepIndex(status: OrderStatus): number {
+  if (status === "pending") return 0
   if (status === "preparing") return 1
   if (status === "ready") return 2
   return 0
 }
 
+function formatTime(ts: number): string {
+  return new Date(ts).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })
+}
+
+function formatDate(ts: number): string {
+  return new Date(ts).toLocaleDateString("es-AR", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+}
+
 export default function OrdersPage() {
   const router = useRouter()
+  const { state, cartCount } = useApp()
   const [activeNav] = useState("orders")
+
+  // TODO: replace with API call (fetch orders for current user)
+  const activeOrders: Order[] = state.orders.filter((o) =>
+    o.status === "pending" || o.status === "preparing" || o.status === "ready"
+  )
+  const pastOrders: Order[] = state.orders.filter((o) => o.status === "completed")
 
   return (
     <div className="min-h-svh flex flex-col items-center" style={{ backgroundColor: "var(--brand-surface)" }}>
@@ -118,7 +68,7 @@ export default function OrdersPage() {
           {/* Active orders */}
           <section>
             <h2 className="text-base font-bold text-foreground mb-3">Pedidos activos</h2>
-            {ACTIVE_ORDERS.length === 0 ? (
+            {activeOrders.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-10 text-center rounded-2xl bg-card border border-border/60">
                 <span className="text-4xl mb-3">🛵</span>
                 <p className="font-semibold text-foreground text-sm">Sin pedidos activos</p>
@@ -126,9 +76,15 @@ export default function OrdersPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {ACTIVE_ORDERS.map((order) => {
+                {activeOrders.map((order) => {
                   const step = stepIndex(order.status)
                   const isReady = order.status === "ready"
+                  const storeCategory =
+                    MOCK_STORES.find((s) => s.id === order.storeId)?.category ?? ""
+                  const itemsLabel = order.items
+                    .map((i) => `${i.product.name} × ${i.quantity}`)
+                    .join(", ")
+
                   return (
                     <div
                       key={order.id}
@@ -152,28 +108,22 @@ export default function OrdersPage() {
                           className="text-xs font-bold"
                           style={{ color: isReady ? "#16A34A" : "#F97316" }}
                         >
-                          {isReady ? "¡Listo para retirar!" : "En preparación"}
+                          {isReady ? "¡Listo para retirar!" : order.status === "pending" ? "Recibido" : "En preparación"}
                         </span>
-                        {!isReady && order.estimatedMinutes && (
-                          <span className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
-                            <Clock size={11} />
-                            ~{order.estimatedMinutes} min
-                          </span>
-                        )}
                       </div>
 
                       <div className="p-4 space-y-3">
                         {/* Store + items */}
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
-                            <p className="font-bold text-sm text-foreground">{order.store}</p>
-                            <p className="text-xs text-muted-foreground mt-0.5 truncate">{order.items}</p>
+                            <p className="font-bold text-sm text-foreground">{order.storeName}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5 truncate">{itemsLabel}</p>
                           </div>
                           <span
                             className="shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full"
                             style={{ backgroundColor: "#FFF0E6", color: "#F97316" }}
                           >
-                            {order.storeCategory}
+                            {storeCategory}
                           </span>
                         </div>
 
@@ -223,7 +173,9 @@ export default function OrdersPage() {
                         <div className="flex items-center justify-between pt-1 border-t border-border/40">
                           <div className="flex items-center gap-1.5">
                             <MapPin size={11} className="text-muted-foreground" />
-                            <span className="text-xs text-muted-foreground">Pedido de las {order.placedAt}</span>
+                            <span className="text-xs text-muted-foreground">
+                              Pedido de las {formatTime(order.createdAt)}
+                            </span>
                           </div>
                           {isReady ? (
                             <div
@@ -232,7 +184,7 @@ export default function OrdersPage() {
                             >
                               <span className="text-xs text-muted-foreground">Código</span>
                               <span className="text-lg font-black" style={{ color: "#16A34A" }}>
-                                #{order.code}
+                                #{order.pickupCode}
                               </span>
                             </div>
                           ) : (
@@ -252,52 +204,50 @@ export default function OrdersPage() {
           {/* Order history */}
           <section>
             <h2 className="text-base font-bold text-foreground mb-3">Historial</h2>
-            {PAST_ORDERS.length === 0 ? (
+            {pastOrders.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-10 text-center">
                 <span className="text-4xl mb-3">📋</span>
                 <p className="font-semibold text-foreground text-sm">Sin pedidos anteriores</p>
               </div>
             ) : (
               <div className="space-y-2">
-                {PAST_ORDERS.map((order) => (
-                  <button
-                    key={order.id}
-                    className="w-full text-left rounded-2xl bg-card border border-border/60 px-4 py-3 flex items-center gap-3 hover:bg-muted/40 transition-colors active:scale-[0.99]"
-                  >
-                    {/* Store icon */}
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0"
-                      style={{ backgroundColor: "#FFF0E6" }}
+                {pastOrders.map((order) => {
+                  const itemsLabel = order.items
+                    .map((i) => `${i.product.name} × ${i.quantity}`)
+                    .join(", ")
+                  return (
+                    <button
+                      key={order.id}
+                      className="w-full text-left rounded-2xl bg-card border border-border/60 px-4 py-3 flex items-center gap-3 hover:bg-muted/40 transition-colors active:scale-[0.99]"
                     >
-                      🧇
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="font-bold text-sm text-foreground truncate">{order.store}</p>
-                        <span
-                          className={cn(
-                            "shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full",
-                            order.status === "completed"
-                              ? "bg-green-50 text-green-700"
-                              : "bg-red-50 text-red-600"
-                          )}
-                        >
-                          {order.status === "completed" ? "Completado" : "Cancelado"}
-                        </span>
+                      {/* Store icon */}
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0"
+                        style={{ backgroundColor: "#FFF0E6" }}
+                      >
+                        🧇
                       </div>
-                      <p className="text-xs text-muted-foreground mt-0.5 truncate">{order.items}</p>
-                      <div className="flex items-center justify-between mt-1">
-                        <span className="text-xs text-muted-foreground">{order.date}</span>
-                        <span className="text-xs font-semibold text-foreground">
-                          ${order.total.toLocaleString("es-AR")}
-                        </span>
-                      </div>
-                    </div>
 
-                    <ChevronRight size={16} className="text-muted-foreground shrink-0" />
-                  </button>
-                ))}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="font-bold text-sm text-foreground truncate">{order.storeName}</p>
+                          <span className="shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-green-50 text-green-700">
+                            Completado
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-0.5 truncate">{itemsLabel}</p>
+                        <div className="flex items-center justify-between mt-1">
+                          <span className="text-xs text-muted-foreground">{formatDate(order.createdAt)}</span>
+                          <span className="text-xs font-semibold text-foreground">
+                            ${order.total.toLocaleString("es-AR")}
+                          </span>
+                        </div>
+                      </div>
+
+                      <ChevronRight size={16} className="text-muted-foreground shrink-0" />
+                    </button>
+                  )
+                })}
               </div>
             )}
           </section>
@@ -306,6 +256,7 @@ export default function OrdersPage() {
         {/* ── Bottom Navigation ── */}
         <BottomNav
           active={activeNav}
+          cartCount={cartCount}
           onChange={(id) => {
             if (id === "home") router.push("/")
             if (id === "cart") router.push("/cart")

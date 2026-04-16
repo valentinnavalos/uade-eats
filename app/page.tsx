@@ -3,86 +3,30 @@
 import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { Bell, MapPin } from "lucide-react"
-import { StoreCard, type Store } from "@/components/store-card"
+import { StoreCard } from "@/components/store-card"
 import { FilterChips } from "@/components/filter-chips"
 import { BottomNav } from "@/components/bottom-nav"
 import { SearchBar } from "@/components/search-bar"
-
-const STORES: Store[] = [
-  {
-    id: "1",
-    name: "Cafetería Pepe",
-    tagline: "El mejor café del campus · Medialunas recién hechas",
-    category: "cafeteria",
-    waitTime: "5–10 min",
-    isOpen: true,
-    image: "/images/cafeteria-pepe.jpg",
-    rating: 4.8,
-    reviewCount: 312,
-  },
-  {
-    id: "2",
-    name: "Pastelería Claudio",
-    tagline: "Tortas artesanales · Alfajores · Brownies",
-    category: "pasteleria",
-    waitTime: "10–15 min",
-    isOpen: true,
-    image: "/images/pasteleria-claudio.jpg",
-    rating: 4.6,
-    reviewCount: 189,
-  },
-  {
-    id: "3",
-    name: "Buffet La Cantina",
-    tagline: "Almuerzo casero · Milanesas · Pastas del día",
-    category: "buffet",
-    waitTime: "15–20 min",
-    isOpen: true,
-    image: "/images/buffet-cantina.jpg",
-    rating: 4.4,
-    reviewCount: 427,
-  },
-  {
-    id: "4",
-    name: "Kiosco Norte",
-    tagline: "Snacks, bebidas y golosinas al paso",
-    category: "kiosco",
-    waitTime: "2–5 min",
-    isOpen: false,
-    image: "/images/kiosco-norte.jpg",
-    rating: 4.2,
-    reviewCount: 98,
-  },
-  {
-    id: "5",
-    name: "Sándwichería El Molino",
-    tagline: "Lomitos, tostados y wraps artesanales",
-    category: "sandwicheria",
-    waitTime: "10–15 min",
-    isOpen: true,
-    image: "/images/sandwicheria-el-molino.jpg",
-    rating: 4.7,
-    reviewCount: 256,
-  },
-]
+// TODO: replace with API call
+import { MOCK_STORES } from "@/lib/mock-data"
+import { useApp } from "@/context/AppContext"
 
 const CATEGORY_DISPLAY: Record<string, string> = {
   cafeteria: "Cafetería",
   pasteleria: "Pastelería",
   buffet: "Buffet",
   kiosco: "Kiosco",
-  sandwicheria: "Sándwiches",
 }
 
 export default function HomePage() {
   const router = useRouter()
+  const { cartCount } = useApp()
   const [activeFilter, setActiveFilter] = useState("all")
   const [activeNav, setActiveNav] = useState("home")
   const [search, setSearch] = useState("")
-  const [cartCount] = useState(2)
 
   const filtered = useMemo(() => {
-    return STORES.filter((store) => {
+    return MOCK_STORES.filter((store) => {
       const matchFilter = activeFilter === "all" || store.category === activeFilter
       const matchSearch =
         search.trim() === "" ||
@@ -187,7 +131,7 @@ export default function HomePage() {
                 Usá el código <span className="font-bold text-white">UADE2025</span> en tu primer pedido
               </p>
             </div>
-            <div className="text-4xl shrink-0">���</div>
+            <div className="text-4xl shrink-0">🎉</div>
           </div>
         </main>
 
