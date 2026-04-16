@@ -17,7 +17,7 @@ import type {
   OrderStatus,
   PaymentMethod,
 } from "@/lib/types"
-import { MOCK_USER } from "@/lib/mock-data"
+import { MOCK_USER, registerUser, findUserByEmail } from "@/lib/mock-data"
 
 // ---------------------------------------------------------------------------
 // State
@@ -58,6 +58,8 @@ type AppAction =
   | { type: "PLACE_ORDER"; payload: { storeName: string; paymentMethod: PaymentMethod } }
   | { type: "UPDATE_ORDER_STATUS"; payload: { orderId: string; status: OrderStatus } }
   | { type: "SET_ACTIVE_ORDER"; payload: { orderId: string | null } }
+  | { type: "REGISTER"; payload: { user: User } }
+  | { type: "RESTORE_SESSION"; payload: User }
 
 // ---------------------------------------------------------------------------
 // Reducer
@@ -75,8 +77,17 @@ function appReducer(state: AppState, action: AppAction): AppState {
       // TODO: replace with real auth provider
       const email = action.payload.email.toLowerCase().trim()
       if (!email.endsWith("@uade.edu.ar")) return state
-      return { ...state, user: MOCK_USER, authStatus: "authenticated" }
+      const found = findUserByEmail(email)
+      return { ...state, user: found ?? MOCK_USER, authStatus: "authenticated" }
     }
+
+    case "REGISTER": {
+      registerUser(action.payload.user)
+      return { ...state, user: action.payload.user, authStatus: "authenticated" }
+    }
+
+    case "RESTORE_SESSION":
+      return { ...state, user: action.payload, authStatus: "authenticated" }
 
     case "LOGOUT":
       return {
@@ -231,7 +242,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // On mount: restore session from cookie so a full page reload keeps the user logged in
   useEffect(() => {
     if (document.cookie.includes("uade-eats-auth=1")) {
-      dispatch({ type: "LOGIN", payload: { email: MOCK_USER.email } })
+      const stored = localStorage.getItem("uade-eats-user")
+      if (stored) {
+        try {
+          dispatch({ type: "RESTORE_SESSION", payload: JSON.parse(stored) as User })
+        } catch {
+          dispatch({ type: "LOGIN", payload: { email: MOCK_USER.email } })
+        }
+      } else {
+        dispatch({ type: "LOGIN", payload: { email: MOCK_USER.email } })
+      }
     }
   }, [])
 
@@ -247,6 +267,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       document.cookie = "uade-eats-auth=1; path=/"
     } else {
       document.cookie = "uade-eats-auth=; path=/; max-age=0"
+      localStorage.removeItem("uade-eats-user")
     }
   }, [state.authStatus])
 

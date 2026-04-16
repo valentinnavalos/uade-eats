@@ -4,7 +4,7 @@ export function proxy(request: NextRequest) {
   const isAuthenticated = request.cookies.get("uade-eats-auth")?.value === "1"
   const { pathname } = request.nextUrl
 
-  if (pathname === "/login") {
+  if (pathname === "/login" || pathname === "/register") {
     if (isAuthenticated) {
       return NextResponse.redirect(new URL("/", request.url))
     }
@@ -19,5 +19,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/login", "/cart", "/orders", "/profile", "/checkout", "/order-status"],
+  matcher: ["/", "/login", "/register", "/cart", "/orders", "/profile", "/checkout", "/order-status"],
 }

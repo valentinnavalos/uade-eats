@@ -207,3 +207,13 @@ export const MOCK_USER: User = {
   legajo: "1234567",
   role: "student",
 }
+
+export let REGISTERED_USERS: User[] = [MOCK_USER]
+
+export function registerUser(user: User): void {
+  REGISTERED_USERS.push(user)
+}
+
+export function findUserByEmail(email: string): User | undefined {
+  return REGISTERED_USERS.find((u) => u.email === email)
+}
