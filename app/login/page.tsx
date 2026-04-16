@@ -82,7 +82,7 @@ export default function LoginPage() {
         {/* Footer */}
         <div className="pb-10 text-center">
           <p className="text-[11px] text-muted-foreground">
-            UADEvelopers — Grupo 5
+            UADevs — Grupo 5
           </p>
         </div>
       </div>

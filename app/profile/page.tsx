@@ -167,7 +167,7 @@ export default function ProfilePage() {
 
           {/* Version footer */}
           <p className="text-center text-[11px] text-muted-foreground pb-2">
-            UADE EATS · v0.1 · UADEvelopers Grupo 5
+            UADE EATS · v0.1 · UADevs Grupo 5
           </p>
         </main>
 

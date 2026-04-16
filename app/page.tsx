@@ -50,7 +50,7 @@ export default function HomePage() {
             <div>
               <div className="flex items-center gap-1.5 text-muted-foreground text-xs font-medium mb-0.5">
                 <MapPin size={12} style={{ color: "#F97316" }} />
-                <span>UADE — Buenos Aires</span>
+                <span>UADE — Sede Lima</span>
               </div>
               <h1 className="text-2xl font-black tracking-tight text-foreground leading-none">
                 UADE{" "}
@@ -128,7 +128,7 @@ export default function HomePage() {
                 ¡Primera orden gratis!
               </p>
               <p className="text-orange-100 text-xs mt-1 leading-relaxed">
-                Usá el código <span className="font-bold text-white">UADE2025</span> en tu primer pedido
+                Usá el código <span className="font-bold text-white">UADE2026</span> en tu primer pedido
               </p>
             </div>
             <div className="text-4xl shrink-0">🎉</div>
