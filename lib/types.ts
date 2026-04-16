@@ -56,3 +56,12 @@ export interface User {
   legajo: string
   role: "student" | "faculty" | "staff"
 }
+
+export type Notification = {
+  id: string
+  title: string
+  body: string
+  timestamp: number
+  read: boolean
+  type: "order" | "promo" | "system"
+}

@@ -7,6 +7,8 @@ import { StoreCard } from "@/components/store-card"
 import { FilterChips } from "@/components/filter-chips"
 import { BottomNav } from "@/components/bottom-nav"
 import { SearchBar } from "@/components/search-bar"
+import { NotificationsPanel } from "@/components/notifications-panel"
+import { FilterModal } from "@/components/filter-modal"
 // TODO: replace with API call
 import { MOCK_STORES } from "@/lib/mock-data"
 import { useApp } from "@/context/AppContext"
@@ -20,21 +22,39 @@ const CATEGORY_DISPLAY: Record<string, string> = {
 
 export default function HomePage() {
   const router = useRouter()
-  const { cartCount } = useApp()
+  const { cartCount, state, dispatch } = useApp()
+  const { notifications } = state
+
   const [activeFilter, setActiveFilter] = useState("all")
   const [activeNav, setActiveNav] = useState("home")
   const [search, setSearch] = useState("")
+  const [showNotifications, setShowNotifications] = useState(false)
+  const [showFilters, setShowFilters] = useState(false)
+  const [onlyOpen, setOnlyOpen] = useState(false)
+  const [sortBy, setSortBy] = useState<"relevance" | "wait" | "rating">("relevance")
+
+  const unreadCount = notifications.filter((n) => !n.read).length
+  const hasActiveFilters = onlyOpen || sortBy !== "relevance"
 
   const filtered = useMemo(() => {
-    return MOCK_STORES.filter((store) => {
+    let result = MOCK_STORES.filter((store) => {
       const matchFilter = activeFilter === "all" || store.category === activeFilter
       const matchSearch =
         search.trim() === "" ||
         store.name.toLowerCase().includes(search.toLowerCase()) ||
         store.tagline.toLowerCase().includes(search.toLowerCase())
-      return matchFilter && matchSearch
+      const matchOpen = !onlyOpen || store.isOpen
+      return matchFilter && matchSearch && matchOpen
     })
-  }, [activeFilter, search])
+
+    if (sortBy === "wait") {
+      result = [...result].sort((a, b) => a.estimatedWaitMinutes - b.estimatedWaitMinutes)
+    } else if (sortBy === "rating") {
+      result = [...result].sort((a, b) => b.rating - a.rating)
+    }
+
+    return result
+  }, [activeFilter, search, onlyOpen, sortBy])
 
   const openCount = filtered.filter((s) => s.isOpen).length
 
@@ -60,14 +80,23 @@ export default function HomePage() {
               </h1>
             </div>
             <button
+              onClick={() => setShowNotifications(true)}
               className="relative w-10 h-10 rounded-xl bg-card border border-border flex items-center justify-center hover:bg-muted transition-colors"
               aria-label="Notificaciones"
             >
               <Bell size={18} className="text-foreground" />
-              <span
-                className="absolute top-2 right-2 w-2 h-2 rounded-full"
-                style={{ backgroundColor: "#F97316" }}
-              />
+              {unreadCount > 0 && (
+                <span
+                  className="absolute top-2 right-2 min-w-[8px] h-2 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: "#F97316" }}
+                >
+                  {unreadCount >= 2 && (
+                    <span className="text-white leading-none" style={{ fontSize: "9px", paddingInline: "2px" }}>
+                      {unreadCount}
+                    </span>
+                  )}
+                </span>
+              )}
             </button>
           </div>
 
@@ -79,7 +108,12 @@ export default function HomePage() {
           </div>
 
           {/* Search */}
-          <SearchBar value={search} onChange={setSearch} />
+          <SearchBar
+            value={search}
+            onChange={setSearch}
+            onFiltersClick={() => setShowFilters(true)}
+            hasActiveFilters={hasActiveFilters}
+          />
 
           {/* Filter chips */}
           <FilterChips active={activeFilter} onChange={setActiveFilter} />
@@ -147,6 +181,32 @@ export default function HomePage() {
           cartCount={cartCount}
         />
       </div>
+
+      {/* ── Notifications Panel ── */}
+      <NotificationsPanel
+        open={showNotifications}
+        onClose={() => setShowNotifications(false)}
+        notifications={notifications}
+        onMarkRead={(id) => dispatch({ type: "MARK_NOTIFICATION_READ", payload: { id } })}
+        onMarkAllRead={() => dispatch({ type: "MARK_ALL_READ" })}
+      />
+
+      {/* ── Filter Modal ── */}
+      <FilterModal
+        open={showFilters}
+        onClose={() => setShowFilters(false)}
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
+        onlyOpen={onlyOpen}
+        onOnlyOpenChange={setOnlyOpen}
+        sortBy={sortBy}
+        onSortByChange={setSortBy}
+        onReset={() => {
+          setActiveFilter("all")
+          setOnlyOpen(false)
+          setSortBy("relevance")
+        }}
+      />
     </div>
   )
 }

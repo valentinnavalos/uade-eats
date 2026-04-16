@@ -16,6 +16,7 @@ import type {
   Order,
   OrderStatus,
   PaymentMethod,
+  Notification,
 } from "@/lib/types"
 import { MOCK_USER, registerUser, findUserByEmail } from "@/lib/mock-data"
 
@@ -32,6 +33,7 @@ interface AppState {
   }
   orders: Order[]
   activeOrderId: string | null
+  notifications: Notification[]
 }
 
 const initialState: AppState = {
@@ -40,6 +42,32 @@ const initialState: AppState = {
   cart: { storeId: null, items: [] },
   orders: [],
   activeOrderId: null,
+  notifications: [
+    {
+      id: "n1",
+      type: "order",
+      title: "¡Tu pedido está listo!",
+      body: "Pasá a retirar tu pedido en Cafetería Pepe. Código #42.",
+      timestamp: Date.now() - 300000,
+      read: false,
+    },
+    {
+      id: "n2",
+      type: "promo",
+      title: "Oferta del día 🎉",
+      body: "Tostado Mixto + Café con Leche por $3.200 en Cafetería Pepe. Solo hoy.",
+      timestamp: Date.now() - 3600000,
+      read: false,
+    },
+    {
+      id: "n3",
+      type: "system",
+      title: "Bienvenido a UADE EATS",
+      body: "Hacé tu primer pedido y retiralo sin filas.",
+      timestamp: Date.now() - 86400000,
+      read: true,
+    },
+  ],
 }
 
 // ---------------------------------------------------------------------------
@@ -60,6 +88,8 @@ type AppAction =
   | { type: "SET_ACTIVE_ORDER"; payload: { orderId: string | null } }
   | { type: "REGISTER"; payload: { user: User } }
   | { type: "RESTORE_SESSION"; payload: User }
+  | { type: "MARK_NOTIFICATION_READ"; payload: { id: string } }
+  | { type: "MARK_ALL_READ" }
 
 // ---------------------------------------------------------------------------
 // Reducer
@@ -210,6 +240,20 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
     case "SET_ACTIVE_ORDER":
       return { ...state, activeOrderId: action.payload.orderId }
+
+    case "MARK_NOTIFICATION_READ":
+      return {
+        ...state,
+        notifications: state.notifications.map((n) =>
+          n.id === action.payload.id ? { ...n, read: true } : n
+        ),
+      }
+
+    case "MARK_ALL_READ":
+      return {
+        ...state,
+        notifications: state.notifications.map((n) => ({ ...n, read: true })),
+      }
 
     default:
       return state
