@@ -99,13 +99,6 @@ export default function ProfilePage() {
             <div className="flex-1 min-w-0">
               <p className="font-black text-base text-foreground leading-tight">{user?.name}</p>
               <p className="text-xs text-muted-foreground mt-0.5">{user?.email}</p>
-              <div
-                className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold"
-                style={{ backgroundColor: "#FFF0E6", color: "#F97316" }}
-              >
-                <span>ID</span>
-                <span>· {user?.legajo}</span>
-              </div>
             </div>
 
             <button

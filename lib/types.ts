@@ -53,7 +53,6 @@ export interface User {
   id: string
   name: string
   email: string
-  legajo: string
   role: "student" | "faculty" | "staff"
 }
 

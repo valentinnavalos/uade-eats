@@ -7,7 +7,6 @@ import type { User } from "@/lib/types"
 interface FieldErrors {
   nombre: string
   email: string
-  legajo: string
   password: string
   confirmPassword: string
 }
@@ -15,7 +14,6 @@ interface FieldErrors {
 const emptyErrors: FieldErrors = {
   nombre: "",
   email: "",
-  legajo: "",
   password: "",
   confirmPassword: "",
 }
@@ -25,7 +23,6 @@ export default function RegisterPage() {
 
   const [nombre, setNombre] = useState("")
   const [email, setEmail] = useState("")
-  const [legajo, setLegajo] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [errors, setErrors] = useState<FieldErrors>(emptyErrors)
@@ -38,10 +35,6 @@ export default function RegisterPage() {
       case "email":
         return !value.toLowerCase().trim().endsWith("@uade.edu.ar")
           ? "Solo podés registrarte con un mail @uade.edu.ar"
-          : ""
-      case "legajo":
-        return !/^\d{6,7}$/.test(value.trim())
-          ? "El legajo debe tener 6 o 7 dígitos numéricos"
           : ""
       case "password":
         return value.length < 8 ? "La contraseña debe tener al menos 8 caracteres" : ""
@@ -64,7 +57,6 @@ export default function RegisterPage() {
     const newErrors: FieldErrors = {
       nombre: validateField("nombre", nombre),
       email: validateField("email", email),
-      legajo: validateField("legajo", legajo),
       password: validateField("password", password),
       confirmPassword: validateField("confirmPassword", confirmPassword),
     }
@@ -77,7 +69,6 @@ export default function RegisterPage() {
       id: `u-${Date.now()}`,
       name: nombre.trim(),
       email: email.toLowerCase().trim(),
-      legajo: legajo.trim(),
       role: "student",
     }
 
@@ -125,7 +116,7 @@ export default function RegisterPage() {
                   if (submitted) setErrors((prev) => ({ ...prev, nombre: validateField("nombre", e.target.value) }))
                 }}
                 onBlur={(e) => handleBlur("nombre", e.target.value)}
-                placeholder="Nombre completo"
+                placeholder="Nombre"
                 autoComplete="name"
                 className="w-full rounded-2xl border border-border bg-card px-4 py-3.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#F97316]/40 focus:border-[#F97316] transition-colors"
               />
@@ -146,7 +137,7 @@ export default function RegisterPage() {
                   if (submitted) setErrors((prev) => ({ ...prev, email: validateField("email", e.target.value) }))
                 }}
                 onBlur={(e) => handleBlur("email", e.target.value)}
-                placeholder="tu.nombre@uade.edu.ar"
+                placeholder="usuario@uade.edu.ar"
                 autoComplete="email"
                 inputMode="email"
                 className="w-full rounded-2xl border border-border bg-card px-4 py-3.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#F97316]/40 focus:border-[#F97316] transition-colors"
@@ -154,27 +145,6 @@ export default function RegisterPage() {
               {errors.email && (
                 <p className="text-xs font-medium px-1" style={{ color: "#EF4444" }}>
                   {errors.email}
-                </p>
-              )}
-            </div>
-
-            {/* Legajo */}
-            <div className="space-y-1.5">
-              <input
-                type="text"
-                value={legajo}
-                onChange={(e) => {
-                  setLegajo(e.target.value)
-                  if (submitted) setErrors((prev) => ({ ...prev, legajo: validateField("legajo", e.target.value) }))
-                }}
-                onBlur={(e) => handleBlur("legajo", e.target.value)}
-                placeholder="Legajo (6 o 7 dígitos)"
-                inputMode="numeric"
-                className="w-full rounded-2xl border border-border bg-card px-4 py-3.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#F97316]/40 focus:border-[#F97316] transition-colors"
-              />
-              {errors.legajo && (
-                <p className="text-xs font-medium px-1" style={{ color: "#EF4444" }}>
-                  {errors.legajo}
                 </p>
               )}
             </div>

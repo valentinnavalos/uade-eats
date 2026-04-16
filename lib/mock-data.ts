@@ -204,7 +204,6 @@ export const MOCK_USER: User = {
   id: "u1",
   name: "John Von Neumann",
   email: "vonneumann@uade.edu.ar",
-  legajo: "1234567",
   role: "student",
 }
 
