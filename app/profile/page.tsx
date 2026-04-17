@@ -56,6 +56,15 @@ const SETTINGS: SettingGroup[] = [
   },
 ]
 
+const NAV_MAP: Record<string, string> = {
+  "Información personal": "/profile/personal-info",
+  "Métodos de pago": "/profile/payment-methods",
+  "Notificaciones": "/profile/notifications-settings",
+  "Tema de la app": "/profile/theme",
+  "Ayuda y preguntas frecuentes": "/profile/help",
+  "Reportar un problema": "/profile/report",
+}
+
 export default function ProfilePage() {
   const router = useRouter()
   const { state, dispatch, cartCount } = useApp()
@@ -102,6 +111,7 @@ export default function ProfilePage() {
             </div>
 
             <button
+              onClick={() => router.push("/profile/personal-info")}
               className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors shrink-0"
               aria-label="Editar perfil"
             >
@@ -111,9 +121,11 @@ export default function ProfilePage() {
 
           {/* Settings groups */}
           {SETTINGS.map((group) => {
-            const items = group.items.map((item) =>
-              item.destructive ? { ...item, onClick: handleLogout } : item
-            )
+            const items = group.items.map((item) => {
+              if (item.destructive) return { ...item, onClick: handleLogout }
+              if (NAV_MAP[item.label]) return { ...item, onClick: () => router.push(NAV_MAP[item.label]) }
+              return item
+            })
             return { ...group, items }
           }).map((group) => (
             <section key={group.title}>
