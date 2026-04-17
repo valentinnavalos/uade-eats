@@ -53,6 +53,14 @@ export interface User {
   id: string
   name: string
   email: string
-  legajo: string
   role: "student" | "faculty" | "staff"
+}
+
+export type Notification = {
+  id: string
+  title: string
+  body: string
+  timestamp: number
+  read: boolean
+  type: "order" | "promo" | "system"
 }

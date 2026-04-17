@@ -5,9 +5,11 @@ import { Search, SlidersHorizontal } from "lucide-react"
 interface SearchBarProps {
   value: string
   onChange: (v: string) => void
+  onFiltersClick?: () => void
+  hasActiveFilters?: boolean
 }
 
-export function SearchBar({ value, onChange }: SearchBarProps) {
+export function SearchBar({ value, onChange, onFiltersClick, hasActiveFilters }: SearchBarProps) {
   return (
     <div className="flex items-center gap-3">
       <div className="flex-1 relative">
@@ -25,10 +27,17 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
         />
       </div>
       <button
-        className="shrink-0 w-11 h-11 rounded-xl flex items-center justify-center border border-border bg-card hover:bg-muted transition-colors active:scale-95"
+        onClick={onFiltersClick}
+        className="relative shrink-0 w-11 h-11 rounded-xl flex items-center justify-center border border-border bg-card hover:bg-muted transition-colors active:scale-95"
         aria-label="Filtros avanzados"
       >
         <SlidersHorizontal size={18} className="text-foreground" />
+        {hasActiveFilters && (
+          <span
+            className="absolute top-2 right-2 w-2 h-2 rounded-full"
+            style={{ backgroundColor: "#F97316" }}
+          />
+        )}
       </button>
     </div>
   )

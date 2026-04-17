@@ -79,10 +79,20 @@ export default function LoginPage() {
           </form>
         </div>
 
+        {/* Link to register */}
+        <div className="text-center -mt-4">
+          <p className="text-sm text-muted-foreground">
+            ¿No tenés cuenta?{" "}
+            <a href="/register" className="font-semibold" style={{ color: "#F97316" }}>
+              Registrate
+            </a>
+          </p>
+        </div>
+
         {/* Footer */}
         <div className="pb-10 text-center">
           <p className="text-[11px] text-muted-foreground">
-            UADEvelopers — Grupo 5
+            UADevs — Grupo 5
           </p>
         </div>
       </div>

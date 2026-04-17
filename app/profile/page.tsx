@@ -56,6 +56,15 @@ const SETTINGS: SettingGroup[] = [
   },
 ]
 
+const NAV_MAP: Record<string, string> = {
+  "Información personal": "/profile/personal-info",
+  "Métodos de pago": "/profile/payment-methods",
+  "Notificaciones": "/profile/notifications-settings",
+  "Tema de la app": "/profile/theme",
+  "Ayuda y preguntas frecuentes": "/profile/help",
+  "Reportar un problema": "/profile/report",
+}
+
 export default function ProfilePage() {
   const router = useRouter()
   const { state, dispatch, cartCount } = useApp()
@@ -99,16 +108,10 @@ export default function ProfilePage() {
             <div className="flex-1 min-w-0">
               <p className="font-black text-base text-foreground leading-tight">{user?.name}</p>
               <p className="text-xs text-muted-foreground mt-0.5">{user?.email}</p>
-              <div
-                className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold"
-                style={{ backgroundColor: "#FFF0E6", color: "#F97316" }}
-              >
-                <span>ID</span>
-                <span>· {user?.legajo}</span>
-              </div>
             </div>
 
             <button
+              onClick={() => router.push("/profile/personal-info")}
               className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors shrink-0"
               aria-label="Editar perfil"
             >
@@ -118,9 +121,11 @@ export default function ProfilePage() {
 
           {/* Settings groups */}
           {SETTINGS.map((group) => {
-            const items = group.items.map((item) =>
-              item.destructive ? { ...item, onClick: handleLogout } : item
-            )
+            const items = group.items.map((item) => {
+              if (item.destructive) return { ...item, onClick: handleLogout }
+              if (NAV_MAP[item.label]) return { ...item, onClick: () => router.push(NAV_MAP[item.label]) }
+              return item
+            })
             return { ...group, items }
           }).map((group) => (
             <section key={group.title}>
@@ -167,7 +172,7 @@ export default function ProfilePage() {
 
           {/* Version footer */}
           <p className="text-center text-[11px] text-muted-foreground pb-2">
-            UADE EATS · v0.1 · UADEvelopers Grupo 5
+            UADE EATS · v0.1 · UADevs Grupo 5
           </p>
         </main>
 
