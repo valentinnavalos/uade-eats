@@ -285,18 +285,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // On mount: restore session from cookie so a full page reload keeps the user logged in
   useEffect(() => {
-    if (document.cookie.includes("uade-eats-auth=1")) {
-      const stored = localStorage.getItem("uade-eats-user")
-      if (stored) {
-        try {
-          dispatch({ type: "RESTORE_SESSION", payload: JSON.parse(stored) as User })
-        } catch {
-          dispatch({ type: "LOGIN", payload: { email: MOCK_USER.email } })
-        }
-      } else {
-        dispatch({ type: "LOGIN", payload: { email: MOCK_USER.email } })
+    const stored = localStorage.getItem("uade-eats-user")
+    if (stored) {
+      try {
+        dispatch({ type: "RESTORE_SESSION", payload: JSON.parse(stored) as User })
+        return
+      } catch {
+        // fall through to auto-login
       }
     }
+    dispatch({ type: "LOGIN", payload: { email: MOCK_USER.email } })
   }, [])
 
   // Sync cookie whenever authStatus changes, but skip the initial render to
