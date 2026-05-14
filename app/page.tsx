@@ -81,7 +81,7 @@ export default function HomePage() {
             </div>
             <button
               onClick={() => {}}
-              className="relative w-10 h-10 rounded-xl bg-card border border-border flex items-center justify-center hover:bg-muted transition-colors"
+              className="relative w-10 h-10 rounded-xl bg-card border border-border flex items-center justify-center hover:bg-muted transition-colors hidden"
               aria-label="Notificaciones"
             >
               <Bell size={18} className="text-foreground" />
