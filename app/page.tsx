@@ -80,7 +80,7 @@ export default function HomePage() {
               </h1>
             </div>
             <button
-              onClick={() => {}}
+              onClick={() => setShowNotifications(true)}
               className="relative w-10 h-10 rounded-xl bg-card border border-border flex items-center justify-center hover:bg-muted transition-colors"
               aria-label="Notificaciones"
             >
@@ -111,10 +111,12 @@ export default function HomePage() {
           <SearchBar
             value={search}
             onChange={setSearch}
-            onFiltersClick={() => {}}
-            hasFilters={false}
+            onFiltersClick={() => setShowFilters(true)}
+            hasActiveFilters={hasActiveFilters}
           />
 
+          {/* Filter chips */}
+          <FilterChips active={activeFilter} onChange={setActiveFilter} />
         </header>
 
         {/* ── Store list ── */}
@@ -150,6 +152,21 @@ export default function HomePage() {
             </div>
           )}
 
+          {/* Promo banner */}
+          <div
+            className="mt-6 rounded-2xl p-4 flex items-center gap-4 overflow-hidden relative"
+            style={{ backgroundColor: "#F97316" }}
+          >
+            <div className="flex-1">
+              <p className="text-white font-bold text-base leading-tight text-balance">
+                ¡Primera orden gratis!
+              </p>
+              <p className="text-orange-100 text-xs mt-1 leading-relaxed">
+                Usá el código <span className="font-bold text-white">UADE2026</span> en tu primer pedido
+              </p>
+            </div>
+            <div className="text-4xl shrink-0">🎉</div>
+          </div>
         </main>
 
         {/* ── Bottom Navigation ── */}

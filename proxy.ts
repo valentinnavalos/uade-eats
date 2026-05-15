@@ -11,6 +11,10 @@ export function proxy(request: NextRequest) {
     return NextResponse.next()
   }
 
+  if (!isAuthenticated) {
+    return NextResponse.redirect(new URL("/login", request.url))
+  }
+
   return NextResponse.next()
 }
 
