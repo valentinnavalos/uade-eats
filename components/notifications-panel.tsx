@@ -113,7 +113,7 @@ export function NotificationsPanel({
                   <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5 leading-relaxed">
                     {n.body}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">{relativeTime(n.timestamp)}</p>
+                  <p className="text-xs text-muted-foreground mt-1" suppressHydrationWarning>{relativeTime(n.timestamp)}</p>
                 </div>
 
                 {!n.read && (
