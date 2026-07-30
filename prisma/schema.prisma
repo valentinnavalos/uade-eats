@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String              @id @default(cuid())
+  name               String
+  email              String              @unique
+  passwordHash       String
+  role               String              @default("student")
+  legajo             String?
+  storeId            String?
+  store              Store?              @relation(fields: [storeId], references: [id])
+  createdAt          DateTime            @default(now())
+  orders             Order[]
+  walletBalance      Float               @default(0)
+  walletTransactions WalletTransaction[]
+  splitBillsCreated  SplitBill[]         @relation("SplitBillCreator")
+  splitPaymentsMade  SplitPayment[]      @relation("SplitPaymentPayer")
+}
+
+model WalletTransaction {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  type           String   // "load" | "payment"
+  amount         Float
+  status         String   @default("pending") // "pending" | "completed" | "failed"
+  mpPreferenceId String?
+  description    String?
+  createdAt      DateTime @default(now())
+}
+
+model Store {
+  id                   String    @id @default(cuid())
+  name                 String
+  category             String
+  tagline              String
+  imageUrl             String
+  estimatedWaitMinutes Int
+  isOpen               Boolean   @default(true)
+  rating               Float
+  walletBalance        Float     @default(0)
+  platformDebt         Float     @default(0)
+  createdAt            DateTime   @default(now())
+  bankInfo             String?    // CVU/CBU/Alias para retiros
+  products               Product[]
+  orders                 Order[]
+  users                  User[]
+  categories             Category[]
+  storeWalletTransactions StoreWalletTransaction[]
+  platformTransactions   PlatformTransaction[]
+}
+
+model StoreWalletTransaction {
+  id          String   @id @default(cuid())
+  storeId     String
+  store       Store    @relation(fields: [storeId], references: [id])
+  type        String   // "payment_received" | "withdrawal" | "debt_payment"
+  amount      Float
+  status      String   @default("completed") // "pending" | "completed" | "rejected"
+  description String?
+  createdAt   DateTime @default(now())
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  storeId   String
+  store     Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  name      String
+  createdAt DateTime  @default(now())
+  products  Product[]
+
+  @@unique([storeId, name])
+}
+
+model Product {
+  id          String    @id @default(cuid())
+  storeId     String
+  store       Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  name        String
+  description String
+  price       Float
+  
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  imageUrl    String
+  createdAt   DateTime @default(now())
+  orderItems  OrderItem[]
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  storeId       String
+  store         Store       @relation(fields: [storeId], references: [id])
+  total         Float
+  serviceFee    Float       @default(0)
+  status        String      @default("pending") // "pending", "preparing", "ready", "completed", "cancelled"
+  paymentMethod String      @default("mercadopago") // mercadopago, efectivo, tarjeta, wallet
+  pickupCode    Int
+  notes         String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  items         OrderItem[]
+  platformTransactions PlatformTransaction[]
+  splitBill     SplitBill?
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  unitPrice Float
+}
+
+model SplitBill {
+  id              String         @id @default(cuid())
+  code            String         @unique
+  orderId         String         @unique
+  order           Order          @relation(fields: [orderId], references: [id])
+  creatorId       String
+  creator         User           @relation("SplitBillCreator", fields: [creatorId], references: [id])
+  peopleCount     Int
+  amountPerPerson Float
+  createdAt       DateTime       @default(now())
+  payments        SplitPayment[]
+}
+
+model SplitPayment {
+  id          String    @id @default(cuid())
+  splitBillId String
+  splitBill   SplitBill @relation(fields: [splitBillId], references: [id], onDelete: Cascade)
+  payerId     String
+  payer       User      @relation("SplitPaymentPayer", fields: [payerId], references: [id])
+  amount      Float
+  createdAt   DateTime  @default(now())
+
+  @@unique([splitBillId, payerId]) // un usuario paga su parte una sola vez
+}
+
+model PlatformTransaction {
+  id          String   @id @default(cuid())
+  amount      Float
+  type        String   // "service_fee" | "debt_payment"
+  description String?
+  storeId     String?
+  store       Store?   @relation(fields: [storeId], references: [id])
+  orderId     String?
+  order       Order?   @relation(fields: [orderId], references: [id])
+  createdAt   DateTime @default(now())
+}

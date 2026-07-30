@@ -8,17 +8,14 @@ import {
   useRef,
   type ReactNode,
 } from "react"
+import { toast } from "sonner"
 import type {
   AuthStatus,
   User,
   Product,
   CartItem,
-  Order,
-  OrderStatus,
-  PaymentMethod,
   Notification,
 } from "@/lib/types"
-import { MOCK_USER, registerUser, findUserByEmail } from "@/lib/mock-data"
 
 // ---------------------------------------------------------------------------
 // State
@@ -29,45 +26,18 @@ interface AppState {
   user: User | null
   cart: {
     storeId: string | null
+    storeName: string | null
     items: CartItem[]
+    notes: string
   }
-  orders: Order[]
-  activeOrderId: string | null
   notifications: Notification[]
 }
 
 const initialState: AppState = {
   authStatus: "unauthenticated",
   user: null,
-  cart: { storeId: null, items: [] },
-  orders: [],
-  activeOrderId: null,
-  notifications: [
-    {
-      id: "n1",
-      type: "order",
-      title: "¡Tu pedido está listo!",
-      body: "Pasá a retirar tu pedido en Cafetería Pepe. Código #42.",
-      timestamp: Date.now() - 300000,
-      read: false,
-    },
-    {
-      id: "n2",
-      type: "promo",
-      title: "Oferta del día 🎉",
-      body: "Tostado Mixto + Café con Leche por $3.200 en Cafetería Pepe. Solo hoy.",
-      timestamp: Date.now() - 3600000,
-      read: false,
-    },
-    {
-      id: "n3",
-      type: "system",
-      title: "Bienvenido a UADE EATS",
-      body: "Hacé tu primer pedido y retiralo sin filas.",
-      timestamp: Date.now() - 86400000,
-      read: true,
-    },
-  ],
+  cart: { storeId: null, storeName: null, items: [], notes: "" },
+  notifications: [],
 }
 
 // ---------------------------------------------------------------------------
@@ -77,19 +47,19 @@ const initialState: AppState = {
 type AppAction =
   | { type: "SET_USER"; payload: User }
   | { type: "CLEAR_USER" }
-  | { type: "LOGIN"; payload: { email: string } }
+  | { type: "LOGIN"; payload: User }
   | { type: "LOGOUT" }
-  | { type: "ADD_TO_CART"; payload: { product: Product; storeId: string } }
+  | { type: "ADD_TO_CART"; payload: { product: Product; storeId: string; storeName: string } }
   | { type: "REMOVE_FROM_CART"; payload: { productId: string } }
   | { type: "UPDATE_QUANTITY"; payload: { productId: string; quantity: number } }
+  | { type: "UPDATE_NOTES"; payload: string }
   | { type: "CLEAR_CART" }
-  | { type: "PLACE_ORDER"; payload: { storeName: string; paymentMethod: PaymentMethod } }
-  | { type: "UPDATE_ORDER_STATUS"; payload: { orderId: string; status: OrderStatus } }
-  | { type: "SET_ACTIVE_ORDER"; payload: { orderId: string | null } }
   | { type: "REGISTER"; payload: { user: User } }
   | { type: "RESTORE_SESSION"; payload: User }
+  | { type: "RESTORE_CART"; payload: AppState["cart"] }
   | { type: "MARK_NOTIFICATION_READ"; payload: { id: string } }
   | { type: "MARK_ALL_READ" }
+  | { type: "ADD_NOTIFICATION"; payload: { type: "order" | "promo" | "system"; title: string; body: string } }
 
 // ---------------------------------------------------------------------------
 // Reducer
@@ -104,32 +74,29 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, user: null }
 
     case "LOGIN": {
-      // TODO: replace with real auth provider
-      const email = action.payload.email.toLowerCase().trim()
-      if (!email.endsWith("@uade.edu.ar")) return state
-      const found = findUserByEmail(email)
-      return { ...state, user: found ?? MOCK_USER, authStatus: "authenticated" }
+      return { ...state, user: action.payload, authStatus: "authenticated" }
     }
 
     case "REGISTER": {
-      registerUser(action.payload.user)
       return { ...state, user: action.payload.user, authStatus: "authenticated" }
     }
 
     case "RESTORE_SESSION":
       return { ...state, user: action.payload, authStatus: "authenticated" }
 
+    case "RESTORE_CART":
+      return { ...state, cart: action.payload }
+
     case "LOGOUT":
       return {
         ...state,
         user: null,
         authStatus: "unauthenticated",
-        cart: { storeId: null, items: [] },
-        activeOrderId: null,
+        cart: { storeId: null, storeName: null, items: [], notes: "" },
       }
 
     case "ADD_TO_CART": {
-      const { product, storeId } = action.payload
+      const { product, storeId, storeName } = action.payload
       let items = state.cart.items
 
       // If adding from a different store, warn and reset cart
@@ -157,7 +124,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
       return {
         ...state,
-        cart: { storeId, items: updatedItems },
+        cart: { storeId, storeName, items: updatedItems, notes: items.length === 0 ? "" : state.cart.notes },
       }
     }
 
@@ -169,7 +136,9 @@ function appReducer(state: AppState, action: AppAction): AppState {
         ...state,
         cart: {
           storeId: updatedItems.length === 0 ? null : state.cart.storeId,
+          storeName: updatedItems.length === 0 ? null : state.cart.storeName,
           items: updatedItems,
+          notes: updatedItems.length === 0 ? "" : state.cart.notes,
         },
       }
     }
@@ -185,7 +154,9 @@ function appReducer(state: AppState, action: AppAction): AppState {
           ...state,
           cart: {
             storeId: updatedItems.length === 0 ? null : state.cart.storeId,
+            storeName: updatedItems.length === 0 ? null : state.cart.storeName,
             items: updatedItems,
+            notes: updatedItems.length === 0 ? "" : state.cart.notes,
           },
         }
       }
@@ -200,46 +171,11 @@ function appReducer(state: AppState, action: AppAction): AppState {
       }
     }
 
+    case "UPDATE_NOTES":
+      return { ...state, cart: { ...state.cart, notes: action.payload } }
+
     case "CLEAR_CART":
-      return { ...state, cart: { storeId: null, items: [] } }
-
-    case "PLACE_ORDER": {
-      const { storeName, paymentMethod: _paymentMethod } = action.payload
-      const total = state.cart.items.reduce(
-        (sum, item) => sum + item.quantity * item.product.price,
-        0
-      )
-      const pickupCode = Math.floor(Math.random() * 90) + 10
-      const newOrder: Order = {
-        id: `order-${Date.now()}`,
-        storeId: state.cart.storeId ?? "",
-        storeName,
-        items: state.cart.items,
-        total,
-        status: "pending",
-        pickupCode,
-        createdAt: Date.now(),
-      }
-      return {
-        ...state,
-        orders: [...state.orders, newOrder],
-        activeOrderId: newOrder.id,
-        cart: { storeId: null, items: [] },
-      }
-    }
-
-    case "UPDATE_ORDER_STATUS":
-      return {
-        ...state,
-        orders: state.orders.map((o) =>
-          o.id === action.payload.orderId
-            ? { ...o, status: action.payload.status }
-            : o
-        ),
-      }
-
-    case "SET_ACTIVE_ORDER":
-      return { ...state, activeOrderId: action.payload.orderId }
+      return { ...state, cart: { storeId: null, storeName: null, items: [], notes: "" } }
 
     case "MARK_NOTIFICATION_READ":
       return {
@@ -254,6 +190,21 @@ function appReducer(state: AppState, action: AppAction): AppState {
         ...state,
         notifications: state.notifications.map((n) => ({ ...n, read: true })),
       }
+
+    case "ADD_NOTIFICATION": {
+      const newNotif: Notification = {
+        id: `n_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+        type: action.payload.type,
+        title: action.payload.title,
+        body: action.payload.body,
+        timestamp: Date.now(),
+        read: false,
+      }
+      return {
+        ...state,
+        notifications: [newNotif, ...state.notifications],
+      }
+    }
 
     default:
       return state
@@ -283,7 +234,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     0
   )
 
-  // On mount: restore session from cookie so a full page reload keeps the user logged in
+  // On mount: restore session from cookie and cart from localStorage
   useEffect(() => {
     if (document.cookie.includes("uade-eats-auth=1")) {
       const stored = localStorage.getItem("uade-eats-user")
@@ -291,10 +242,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
         try {
           dispatch({ type: "RESTORE_SESSION", payload: JSON.parse(stored) as User })
         } catch {
-          dispatch({ type: "LOGIN", payload: { email: MOCK_USER.email } })
+          dispatch({ type: "LOGOUT" })
         }
       } else {
-        dispatch({ type: "LOGIN", payload: { email: MOCK_USER.email } })
+        dispatch({ type: "LOGOUT" })
+      }
+    }
+
+    const storedCart = localStorage.getItem("uade-eats-cart")
+    if (storedCart) {
+      try {
+        dispatch({ type: "RESTORE_CART", payload: JSON.parse(storedCart) })
+      } catch (err) {
+        console.error("Failed to restore cart", err)
       }
     }
   }, [])
@@ -307,13 +267,83 @@ export function AppProvider({ children }: { children: ReactNode }) {
       isMounted.current = true
       return
     }
-    if (state.authStatus === "authenticated") {
+    if (state.authStatus === "authenticated" && state.user) {
       document.cookie = "uade-eats-auth=1; path=/"
+      localStorage.setItem("uade-eats-user", JSON.stringify(state.user))
     } else {
       document.cookie = "uade-eats-auth=; path=/; max-age=0"
       localStorage.removeItem("uade-eats-user")
     }
-  }, [state.authStatus])
+  }, [state.authStatus, state.user])
+
+  // Persist cart to localStorage whenever it changes
+  const isCartRestored = useRef(false)
+  useEffect(() => {
+    if (!isCartRestored.current) {
+      isCartRestored.current = true
+      return
+    }
+    localStorage.setItem("uade-eats-cart", JSON.stringify(state.cart))
+  }, [state.cart])
+
+  // Listen to SSE events for real-time Event-Driven updates and trigger notifications
+  useEffect(() => {
+    if (state.authStatus !== "authenticated" || state.user?.role !== "student") {
+      return
+    }
+
+    const eventSource = new EventSource("/api/sse")
+
+    eventSource.onmessage = (event) => {
+      try {
+        const { type, data } = JSON.parse(event.data)
+        
+        // Verify this update belongs to this student
+        if (type === "order_updated" && data.userId === state.user?.id) {
+          const { status, order } = data
+          const storeName = order?.store?.name || "Comedor"
+
+          let title = ""
+          let body = ""
+
+          if (status === "preparing") {
+            title = "¡Pedido en preparación! 👨‍🍳"
+            body = `Tu pedido de ${storeName} ya se está preparando.`
+          } else if (status === "ready") {
+            title = "¡Pedido listo! 🛵"
+            body = `Tu pedido de ${storeName} está listo. Retiralo con el código #${order.pickupCode}.`
+          } else if (status === "completed") {
+            title = "¡Pedido entregado! 🎉"
+            body = `¡Gracias por tu compra en ${storeName}! Que lo disfrutes.`
+          } else if (status === "cancelled") {
+            title = "Pedido cancelado ❌"
+            body = `Tu pedido de ${storeName} fue cancelado.`
+          }
+
+          if (title && body) {
+            dispatch({
+              type: "ADD_NOTIFICATION",
+              payload: { type: "order", title, body }
+            })
+            toast.success(title, {
+              description: body,
+              duration: 6000,
+            })
+          }
+        }
+      } catch (err) {
+        console.error("SSE parse error:", err)
+      }
+    }
+
+    eventSource.onerror = (err) => {
+      console.error("SSE connection error:", err)
+    }
+
+    return () => {
+      eventSource.close()
+    }
+  }, [state.authStatus, state.user, dispatch])
 
   return (
     <AppContext.Provider value={{ state, dispatch, cartCount }}>

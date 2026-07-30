@@ -2,13 +2,11 @@
 
 import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Store, ChevronRight, Info } from "lucide-react"
+import { ArrowLeft, Store } from "lucide-react"
 import { CartItem } from "@/components/cart-item"
 import { CartEmpty } from "@/components/cart-empty"
 import { BottomNav } from "@/components/bottom-nav"
 import type { Product } from "@/lib/types"
-// TODO: replace with API call
-import { MOCK_STORES } from "@/lib/mock-data"
 import { useApp } from "@/context/AppContext"
 
 export default function CartPage() {
@@ -17,19 +15,19 @@ export default function CartPage() {
   const [activeNav, setActiveNav] = useState("cart")
 
   const cartItems = state.cart.items
-  const storeName = state.cart.storeId
-    ? (MOCK_STORES.find((s) => s.id === state.cart.storeId)?.name ?? "")
-    : ""
+  const storeName = state.cart.storeName ?? ""
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.quantity * item.product.price,
     0
   )
+  const estimatedServiceFee = subtotal * 0.05
+  const estimatedTotal = subtotal + estimatedServiceFee
   const isEmpty = cartItems.length === 0
 
   const handleAdd = useCallback(
     (product: Product) => {
       if (!state.cart.storeId) return
-      dispatch({ type: "ADD_TO_CART", payload: { product, storeId: state.cart.storeId } })
+      dispatch({ type: "ADD_TO_CART", payload: { product, storeId: state.cart.storeId, storeName: state.cart.storeName ?? "" } })
     },
     [dispatch, state.cart.storeId]
   )
@@ -55,10 +53,6 @@ export default function CartPage() {
   )
 
   const handleConfirm = () => {
-    dispatch({
-      type: "PLACE_ORDER",
-      payload: { storeName, paymentMethod: "efectivo" },
-    })
     router.push("/checkout")
   }
 
@@ -86,17 +80,12 @@ export default function CartPage() {
                 Tu pedido
               </h1>
               {!isEmpty && storeName && (
-                <button
-                  onClick={() => router.push("/store")}
-                  className="flex items-center gap-1 mt-0.5 group"
-                  aria-label={`Ver ${storeName}`}
-                >
+                <div className="flex items-center gap-1 mt-0.5">
                   <Store size={11} style={{ color: "#F97316" }} />
-                  <span className="text-xs text-muted-foreground group-hover:underline leading-none">
+                  <span className="text-xs text-muted-foreground leading-none">
                     {storeName}
                   </span>
-                  <ChevronRight size={11} className="text-muted-foreground" />
-                </button>
+                </div>
               )}
             </div>
 
@@ -117,16 +106,9 @@ export default function CartPage() {
         ) : (
           <>
             <main className="flex-1 overflow-y-auto pb-[272px]">
-              {/* Swipe hint */}
-              <div className="flex items-center gap-1.5 mx-4 mt-4 mb-3 px-3 py-2 rounded-xl" style={{ backgroundColor: "#FFF0E6" }}>
-                <Info size={13} style={{ color: "#F97316" }} />
-                <p className="text-xs font-medium" style={{ color: "#C2410C" }}>
-                  Deslizá hacia la izquierda para eliminar un producto
-                </p>
-              </div>
 
               {/* Cart item list */}
-              <section className="px-4 space-y-3" aria-label="Productos en el carrito">
+              <section className="px-4 pt-4 space-y-3" aria-label="Productos en el carrito">
                 {cartItems.map((item) => (
                   <CartItem
                     key={item.product.id}
@@ -150,6 +132,8 @@ export default function CartPage() {
                 <textarea
                   id="cart-notes"
                   rows={2}
+                  value={state.cart.notes}
+                  onChange={(e) => dispatch({ type: "UPDATE_NOTES", payload: e.target.value })}
                   placeholder="Ej: sin azúcar, sin cebolla…"
                   className="w-full resize-none rounded-2xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 leading-relaxed"
                   style={{ "--tw-ring-color": "#F97316" } as React.CSSProperties}
@@ -158,7 +142,10 @@ export default function CartPage() {
             </main>
 
             {/* ── Fixed bottom: subtotal + CTA ──────────────────────────── */}
-            <div className="fixed bottom-0 left-0 right-0 z-50 max-w-[480px] mx-auto bg-card border-t border-border/60 px-4 pt-4 pb-2">
+            <div 
+              className="fixed bottom-0 w-full max-w-[480px] z-50 bg-card border-t border-border/60 px-4 pt-4 pb-2"
+              style={{ left: "50%", transform: "translateX(-50%)" }}
+            >
               {/* Subtotal rows */}
               <div className="space-y-2 mb-3">
                 <div className="flex items-center justify-between text-sm">
@@ -170,19 +157,16 @@ export default function CartPage() {
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Costo de servicio</span>
-                  <span
-                    className="font-semibold text-xs px-2 py-0.5 rounded-full"
-                    style={{ backgroundColor: "#F0FDF4", color: "#16A34A" }}
-                  >
-                    Gratis
+                  <span className="text-muted-foreground">Costo de servicio (5%)</span>
+                  <span className="font-semibold text-foreground">
+                    ${estimatedServiceFee.toLocaleString("es-AR", { maximumFractionDigits: 0 })}
                   </span>
                 </div>
                 <div className="h-px bg-border" />
                 <div className="flex items-center justify-between">
                   <span className="font-black text-foreground text-base">Total</span>
                   <span className="font-black text-foreground text-xl">
-                    ${subtotal.toLocaleString("es-AR")}
+                    ${estimatedTotal.toLocaleString("es-AR", { maximumFractionDigits: 0 })}
                     <span className="text-xs font-medium text-muted-foreground ml-1">ARS</span>
                   </span>
                 </div>
@@ -197,7 +181,7 @@ export default function CartPage() {
               >
                 <span className="text-base">Confirmar pedido</span>
                 <span className="text-base font-black">
-                  ${subtotal.toLocaleString("es-AR")}
+                  ${estimatedTotal.toLocaleString("es-AR", { maximumFractionDigits: 0 })}
                 </span>
               </button>
 
@@ -214,6 +198,7 @@ export default function CartPage() {
             setActiveNav(id)
             if (id === "home") router.push("/")
             if (id === "orders") router.push("/orders")
+            if (id === "wallet") router.push("/wallet")
             if (id === "profile") router.push("/profile")
           }}
           cartCount={cartCount}

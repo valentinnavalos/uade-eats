@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { ChevronLeft, Lock } from "lucide-react"
 import { useApp } from "@/context/AppContext"
@@ -8,20 +8,71 @@ import { toast } from "sonner"
 
 export default function PersonalInfoPage() {
   const router = useRouter()
-  const { state } = useApp()
+  const { state, dispatch } = useApp()
   const user = state.user
 
   const initials = user
     ? user.name.split(" ").map((w) => w[0]).slice(0, 2).join("")
     : "?"
 
-  const roleLabel =
-    user?.role === "faculty" ? "Docente" : user?.role === "staff" ? "Staff" : "Estudiante"
+  const roleLabel = useMemo(() => {
+    if (user?.role === "store_owner") return "Vendedor";
+    if (user?.role === "faculty") return "Docente";
+
+    return "Estudiante"
+  }, [user?.role])
 
   const [name, setName] = useState(user?.name ?? "")
 
-  const handleSave = () => {
-    toast.success("Cambios guardados ✓")
+  const [loading, setLoading] = useState(false)
+
+  const handleSave = async () => {
+    const newName = name.trim()
+    if (!newName) {
+      toast.error("El nombre no puede estar vacío")
+      return
+    }
+
+    if (newName === user?.name) {
+      toast.success("Cambios guardados ✓")
+      return
+    }
+
+    setLoading(true)
+    const loadId = toast.loading("Guardando...")
+    try {
+      const res = await fetch("/api/user", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newName })
+      })
+      
+      if (!res.ok) {
+        // Try to parse JSON error, if it's not JSON it will throw and go to catch
+        const text = await res.text()
+        try {
+          const data = JSON.parse(text)
+          toast.error(data.error || "Error al guardar", { id: loadId })
+        } catch {
+          toast.error("Error del servidor o versión desactualizada", { id: loadId })
+        }
+        return
+      }
+
+      const data = await res.json()
+      
+      if (data.success) {
+        dispatch({ type: "SET_USER", payload: data.user })
+        toast.success("Cambios guardados ✓", { id: loadId })
+      } else {
+        toast.error(data.error || "Error al guardar", { id: loadId })
+      }
+    } catch (e: any) {
+      console.error(e)
+      toast.error(`Error: ${e?.message || e?.toString() || "Desconocido"}`, { id: loadId, duration: 10000 })
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -111,10 +162,11 @@ export default function PersonalInfoPage() {
         {/* Save button */}
         <button
           onClick={handleSave}
-          className="w-full py-3 rounded-xl font-semibold text-white text-sm"
+          disabled={loading}
+          className="w-full py-3 rounded-xl font-semibold text-white text-sm disabled:opacity-50"
           style={{ backgroundColor: "#F97316" }}
         >
-          Guardar cambios
+          {loading ? "Guardando..." : "Guardar cambios"}
         </button>
       </div>
     </div>

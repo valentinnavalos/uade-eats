@@ -18,3 +18,11 @@ node_modules
 .DS_Store
 .claude/
 tsconfig.tsbuildinfo
+
+/lib/generated/prisma
+.env
+dev.db
+*.db
+*.db-journal
+
+.vercel
