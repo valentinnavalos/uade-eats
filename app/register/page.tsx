@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useApp } from "@/context/AppContext"
+import { BuiltBy } from "@/components/built-by"
 
 interface FieldErrors {
   nombre: string
@@ -133,7 +134,7 @@ export default function RegisterPage() {
               </span>
             </h1>
             <p className="text-sm text-muted-foreground font-medium">
-              Creá tu cuenta universitaria
+              Creá tu cuenta
             </p>
           </div>
 
@@ -286,9 +287,7 @@ export default function RegisterPage() {
 
         {/* Footer */}
         <div className="pb-10 text-center absolute bottom-0 left-0 right-0">
-          <p className="text-[11px] text-muted-foreground">
-            UADevs — Grupo 5
-          </p>
+          <BuiltBy />
         </div>
       </div>
     </div>

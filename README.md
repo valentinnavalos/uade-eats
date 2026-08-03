@@ -159,6 +159,6 @@ pnpm dev
 
 Academic project.
 
-Made for **Seminario de Integración Profesional** · UADevs Grupo 5 · UADE
+Made for **Seminario de Integración Profesional** · UADE
 
 </div>

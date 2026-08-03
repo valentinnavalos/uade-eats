@@ -16,6 +16,7 @@ import {
 import { BottomNav } from "@/components/bottom-nav"
 import { cn } from "@/lib/utils"
 import { useApp } from "@/context/AppContext"
+import { BuiltBy } from "@/components/built-by"
 
 interface SettingItem {
   icon: React.ElementType
@@ -197,7 +198,7 @@ export default function ProfilePage() {
 
           {/* Version footer */}
           <p className="text-center text-[11px] text-muted-foreground pb-2">
-            UADE EATS · v0.1 · UADevs Grupo 5
+            <BuiltBy />
           </p>
         </main>
 

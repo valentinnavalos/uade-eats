@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useApp } from "@/context/AppContext"
+import { BuiltBy } from "@/components/built-by"
 
 export default function LoginPage() {
   const { dispatch } = useApp()
@@ -21,7 +22,7 @@ export default function LoginPage() {
       setError("Ingresá tu contraseña")
       return
     }
-    
+
     setError("")
     setLoading(true)
 
@@ -43,7 +44,7 @@ export default function LoginPage() {
       dispatch({ type: "LOGIN", payload: data.user })
       localStorage.setItem("uade-eats-user", JSON.stringify(data.user))
       document.cookie = "uade-eats-auth=1; path=/"
-      
+
       if (data.user.role === "store_owner") {
         window.location.replace("/store-portal")
       } else if (data.user.role === "admin") {
@@ -138,9 +139,7 @@ export default function LoginPage() {
 
         {/* Footer */}
         <div className="pb-10 text-center absolute bottom-0 left-0 right-0">
-          <p className="text-[11px] text-muted-foreground">
-            UADevs — Grupo 5
-          </p>
+          <BuiltBy />
         </div>
       </div>
     </div>
