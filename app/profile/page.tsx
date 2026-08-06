@@ -16,7 +16,7 @@ import {
 import { BottomNav } from "@/components/bottom-nav"
 import { cn } from "@/lib/utils"
 import { useApp } from "@/context/AppContext"
-import { BuiltBy } from "@/components/built-by"
+import { BuiltBy } from "@/components/powered-by"
 
 interface SettingItem {
   icon: React.ElementType

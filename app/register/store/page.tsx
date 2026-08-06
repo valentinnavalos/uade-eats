@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useApp } from "@/context/AppContext"
-import { BuiltBy } from "@/components/built-by"
+import { BuiltBy } from "@/components/powered-by"
 
 interface Store {
   id: string
