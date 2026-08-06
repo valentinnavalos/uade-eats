@@ -195,9 +195,9 @@ export default function ProfilePage() {
           ))}
 
           {/* Version footer */}
-          <p className="text-center text-[11px] text-muted-foreground pb-2">
+          <div className="text-center text-[11px] text-muted-foreground pb-2">
             <PoweredBy />
-          </p>
+          </div>
         </main>
 
         {/* ── Bottom Navigation ── */}

@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useApp } from "@/context/AppContext"
 import { PoweredBy } from "@/components/powered-by"
+import { DEMO_CREDENTIALS } from "@/lib/demo-credentials"
 
 export default function LoginPage() {
   const { dispatch } = useApp()
@@ -11,14 +12,13 @@ export default function LoginPage() {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    const trimmed = email.toLowerCase().trim()
+  async function login(emailValue: string, passwordValue: string) {
+    const trimmed = emailValue.toLowerCase().trim()
     if (!trimmed) {
       setError("Ingresá tu correo electrónico")
       return
     }
-    if (!password) {
+    if (!passwordValue) {
       setError("Ingresá tu contraseña")
       return
     }
@@ -30,7 +30,7 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: trimmed, password }),
+        body: JSON.stringify({ email: trimmed, password: passwordValue }),
       })
 
       const data = await res.json()
@@ -56,6 +56,17 @@ export default function LoginPage() {
       setError("Error de conexión")
       setLoading(false)
     }
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    login(email, password)
+  }
+
+  function handleDemoLogin() {
+    setEmail(DEMO_CREDENTIALS.email)
+    setPassword(DEMO_CREDENTIALS.password)
+    login(DEMO_CREDENTIALS.email, DEMO_CREDENTIALS.password)
   }
 
   return (
@@ -125,6 +136,29 @@ export default function LoginPage() {
               {loading ? "Ingresando..." : "Ingresar"}
             </button>
           </form>
+
+          {/* Demo access */}
+          <div className="mt-6 space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-xs font-medium text-muted-foreground">o</span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+
+            <button
+              type="button"
+              onClick={handleDemoLogin}
+              disabled={loading}
+              className="w-full rounded-2xl border py-3.5 text-sm font-bold transition-colors hover:bg-[#F97316]/10 active:opacity-80 disabled:opacity-50"
+              style={{ borderColor: "#F97316", color: "#F97316" }}
+            >
+              Probar con cuenta demo
+            </button>
+
+            <p className="select-text text-center text-sm text-muted-foreground break-words">
+              usuario: {DEMO_CREDENTIALS.email} · contraseña: {DEMO_CREDENTIALS.password}
+            </p>
+          </div>
 
           {/* Link to register */}
           <div className="text-center">
