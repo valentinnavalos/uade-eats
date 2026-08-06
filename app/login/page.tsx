@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useApp } from "@/context/AppContext"
-import { BuiltBy } from "@/components/powered-by"
+import { PoweredBy } from "@/components/powered-by"
 
 export default function LoginPage() {
   const { dispatch } = useApp()
@@ -89,7 +89,7 @@ export default function LoginPage() {
                   setEmail(e.target.value)
                   if (error) setError("")
                 }}
-                placeholder="tu.nombre@uade.edu.ar"
+                placeholder="usuario@uade.edu.ar"
                 autoComplete="email"
                 inputMode="email"
                 className="w-full rounded-2xl border border-border bg-card px-4 py-3.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#F97316]/40 focus:border-[#F97316] transition-colors"
@@ -139,7 +139,7 @@ export default function LoginPage() {
 
         {/* Footer */}
         <div className="pb-10 text-center absolute bottom-0 left-0 right-0">
-          <BuiltBy />
+          <PoweredBy />
         </div>
       </div>
     </div>

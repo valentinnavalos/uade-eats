@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useApp } from "@/context/AppContext"
-import { BuiltBy } from "@/components/powered-by"
+import { PoweredBy } from "@/components/powered-by"
 
 interface Store {
   id: string
@@ -313,7 +313,7 @@ export default function RegisterStorePage() {
 
         {/* Footer */}
         <div className="pb-10 text-center absolute bottom-0 left-0 right-0">
-          <BuiltBy />
+          <PoweredBy />
         </div>
       </div>
     </div>

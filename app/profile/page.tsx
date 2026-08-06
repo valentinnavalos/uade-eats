@@ -4,8 +4,6 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import {
   ChevronRight,
-  User,
-  CreditCard,
   Bell,
   Sun,
   HelpCircle,
@@ -16,7 +14,7 @@ import {
 import { BottomNav } from "@/components/bottom-nav"
 import { cn } from "@/lib/utils"
 import { useApp } from "@/context/AppContext"
-import { BuiltBy } from "@/components/powered-by"
+import { PoweredBy } from "@/components/powered-by"
 
 interface SettingItem {
   icon: React.ElementType
@@ -198,7 +196,7 @@ export default function ProfilePage() {
 
           {/* Version footer */}
           <p className="text-center text-[11px] text-muted-foreground pb-2">
-            <BuiltBy />
+            <PoweredBy />
           </p>
         </main>
 

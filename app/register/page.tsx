@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useApp } from "@/context/AppContext"
-import { BuiltBy } from "@/components/powered-by"
+import { PoweredBy } from "@/components/powered-by"
 
 interface FieldErrors {
   nombre: string
@@ -287,7 +287,7 @@ export default function RegisterPage() {
 
         {/* Footer */}
         <div className="pb-10 text-center absolute bottom-0 left-0 right-0">
-          <BuiltBy />
+          <PoweredBy />
         </div>
       </div>
     </div>
